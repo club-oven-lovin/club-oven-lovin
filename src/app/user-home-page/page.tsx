@@ -1,8 +1,14 @@
 import { getServerSession } from 'next-auth';
-import { Container } from 'react-bootstrap';
+import { Container, Row, Button, Col,  } from 'react-bootstrap';
 import authOptions from '@/lib/authOptions';
 import { loggedInProtectedPage } from '@/lib/page-protection';
 
+
+const actionButtons = [
+  { label: 'Search Recipes', href: '/recipes/search' },
+  { label: 'Add New Recipe', href: '/add' },
+  { label: 'My Saved Recipes', href: '/recipes/saved' },
+];
 
 const UserHomePage = async () => {
   const session = (await getServerSession(authOptions)) as {
@@ -21,6 +27,23 @@ const UserHomePage = async () => {
           <p className="lead text-muted">Ready to dive back into your kitchen creations?</p>
         </Container>
       </section>
+
+      <Container className="py-5">
+        <Row className="g-4 justify-content-center">
+          {actionButtons.map(({ label, href }) => (
+            <Col key={label} xs={12} sm={6} md={4} className="d-flex">
+              <Button
+                href={href}
+                size="lg"
+                variant="dark"
+                className="flex-fill py-3 text-uppercase fw-semibold shadow-sm"
+              >
+                {label}
+              </Button>
+            </Col>
+          ))}
+        </Row>
+      </Container>
     </main>
   );
 };
