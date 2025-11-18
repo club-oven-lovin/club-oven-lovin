@@ -16,7 +16,7 @@ const UserHomePage = async () => {
   } | null;
 
   loggedInProtectedPage(session);
-  const displayName = session?.user?.name ?? session?.user?.email ?? 'friend';
+  const displayName = session?.user?.name ?? 'Miron';
 
   return (
     <main>
