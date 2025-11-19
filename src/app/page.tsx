@@ -1,10 +1,13 @@
+'use client';
+
 import { HeroSection } from '@/components/marketing/HeroSection';
+import QuickStats from '@/components/QuickStats';
 
-/** The Home page. */
-const Home = () => (
-  <main>
-    <HeroSection />
-  </main>
-);
-
-export default Home;
+export default function HomePage() {
+  return (
+    <>
+      <HeroSection />
+      <QuickStats />
+    </>
+  );
+}
