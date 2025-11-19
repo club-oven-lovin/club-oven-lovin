@@ -7,6 +7,8 @@ import { prisma } from '@/lib/prisma';
 import EditStuffForm from '@/components/EditStuffForm';
 
 export default async function EditStuffPage({ params }: { params: { id: string | string[] } }) {
+  const rawId = Array.isArray(params?.id) ? params.id[0] : params.id;
+  const id = Number(rawId);
   // Protect the page, only logged in users can access it.
   const session = await getServerSession(authOptions);
   loggedInProtectedPage(
@@ -14,8 +16,8 @@ export default async function EditStuffPage({ params }: { params: { id: string |
       user: { email: string; id: string; randomKey: string };
       // eslint-disable-next-line @typescript-eslint/comma-dangle
     } | null,
+    rawId ? `/edit/${rawId}` : '/edit',
   );
-  const id = Number(Array.isArray(params?.id) ? params?.id[0] : params?.id);
   // console.log(id);
   const stuff: Stuff | null = await prisma.stuff.findUnique({
     where: { id },

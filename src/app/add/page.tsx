@@ -10,6 +10,7 @@ const AddStuff = async () => {
     session as {
       user: { email: string; id: string; randomKey: string };
     } | null,
+    '/add',
   );
   return (
     <main>

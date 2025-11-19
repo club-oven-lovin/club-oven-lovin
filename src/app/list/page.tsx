@@ -14,6 +14,7 @@ const ListPage = async () => {
       user: { email: string; id: string; randomKey: string };
       // eslint-disable-next-line @typescript-eslint/comma-dangle
     } | null,
+    '/list',
   );
   const owner = (session && session.user && session.user.email) || '';
   const stuff = await prisma.stuff.findMany({
