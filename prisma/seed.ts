@@ -36,7 +36,54 @@ async function main() {
       },
     });
   }
+
+  // Seed VENDORS
+  if (config.defaultVendors) {
+    for (const vendor of config.defaultVendors) {
+      console.log(`  Creating vendor for: ${vendor.owner}`);
+
+      await prisma.vendor.upsert({
+        where: { owner: vendor.owner },
+        update: {},
+        create: {
+          owner: vendor.owner,
+          name: vendor.name,
+          address: vendor.address,
+          hours: vendor.hours,
+        },
+      });
+    }
+  }
+
+  // Seed INGREDIENTS
+  if (config.defaultIngredients) {
+    for (const ing of config.defaultIngredients) {
+      console.log(`  Creating ingredient: ${ing.name}`);
+
+      const vendor = await prisma.vendor.findFirst({
+        where: { name: ing.vendorName },
+      });
+
+      if (!vendor) {
+        console.log(`  ⚠ Skipping "${ing.name}" because vendor "${ing.vendorName}" not found`);
+        continue;
+      }
+
+      await prisma.ingredient.create({
+        data: {
+          owner: ing.owner,
+          name: ing.name,
+          price: ing.price,
+          size: ing.size,
+          available: ing.available,
+          vendorId: vendor.id,
+        },
+      });
+    }
+  }
 }
+
+
 main()
   .then(() => prisma.$disconnect())
   .catch(async (e) => {

@@ -43,3 +43,26 @@ model Stuff {
   condition Condition @default(good)
   owner     String
 }
+
+// Vendor Things
+model Vendor {
+  id          String        @id @default(uuid())
+  owner       String @unique        // email of logged-in user
+  name        String
+  address     String?
+  hours       String?
+
+  ingredients Ingredient[]
+}
+
+model Ingredient {
+  id        String   @id @default(uuid())
+  owner     String
+  vendorId  String?
+  vendor    Vendor?  @relation(fields: [vendorId], references: [id])
+
+  name      String
+  price     Float
+  size      String
+  available Boolean  @default(true)
+}

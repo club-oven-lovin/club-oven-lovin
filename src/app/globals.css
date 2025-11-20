@@ -132,3 +132,28 @@ body {
     font-size: 1rem;
   }
 }
+/* Make greeting card fully orange */
+.vendor-homepage-greeting-card {
+  color: #0b5e57 !important;           /* darker teal text */
+}
+
+.vendor-homepage-greeting-card .card-title,
+.vendor-homepage-greeting-card .card-text {
+  color: #0b5e57 !important; /* ensure text is dark teal */
+}
+
+/* Vendor table header text color */
+.vendor-homepage-table thead th {
+  background-color: #d6f5f0 !important; /* light mint */
+}
+
+.vendor-homepage-orange-btn {
+  background-color: #f97316 !important;
+  border-color: #f97316 !important;
+  color: white !important;
+}
+
+.vendor-homepage-orange-btn:hover {
+  background-color: #ea580c !important;
+  border-color: #ea580c !important;
+}

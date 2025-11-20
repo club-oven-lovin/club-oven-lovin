@@ -9,5 +9,33 @@
     { "name": "Bicycle", "quantity": 2, "owner": "john@foo.com", "condition": "poor" },
     { "name": "Banana", "quantity": 2, "owner": "admin@foo.com", "condition": "good" },
     { "name": "Boogie Board", "quantity": 2, "owner": "admin@foo.com", "condition": "excellent" }
+  ],
+
+  "defaultVendors": [
+    {
+      "owner": "john@foo.com",
+      "name": "John’s Fresh Market",
+      "address": "123 College Ave",
+      "hours": "8am - 6pm"
+    }
+  ],
+
+  "defaultIngredients": [
+    {
+      "owner": "john@foo.com",
+      "vendorName": "John’s Fresh Market",
+      "name": "Milk",
+      "price": 4.99,
+      "size": "1 gallon",
+      "available": true
+    },
+    {
+      "owner": "john@foo.com",
+      "vendorName": "John’s Fresh Market",
+      "name": "Eggs",
+      "price": 3.49,
+      "size": "12-pack",
+      "available": true
+    }
   ]
 }
