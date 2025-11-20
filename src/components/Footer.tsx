@@ -14,11 +14,6 @@ const Footer = () => (
             <br />
             Honolulu, HI 96822
           </p>
-          <p className="mt-2">
-            <a href="http://ics-software-engineering.github.io/nextjs-application-template" style={{ color: 'white', textDecoration: 'none' }}> {/* White link */}
-              Template Home Page
-            </a>
-          </p>
         </Col>
       </Row>
     </Container>
