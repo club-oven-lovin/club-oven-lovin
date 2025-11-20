@@ -25,7 +25,7 @@ const SignIn = () => {
   };
 
   return (
-    <main>
+    <main className="signin-page">
       <Container>
         <Row className="justify-content-center">
           <Col xs={5}>
