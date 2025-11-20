@@ -3,14 +3,17 @@
 import { Container, Row, Col, Card } from 'react-bootstrap';
 
 const QuickStats = () => {
+  const creamColor = '#fff8f1';
+  const orangeColor = '#ff6b35';
+
   return (
-    <Container className="py-5">
-      <h2 className="text-center mb-5 fw-bold">Quick Stats</h2>
+    <Container fluid className="py-5" style={{ backgroundColor: creamColor }}> {/* Cream background */}
+      <h2 className="text-center mb-5 fw-bold" style={{ color: orangeColor }}>Quick Stats</h2>
       <Row className="text-center">
         <Col md={3} sm={6} className="mb-4">
           <Card className="border-0 shadow-sm h-100">
             <Card.Body>
-              <h3 className="display-5 fw-bold" style={{ color: '#ff6b35' }}>140</h3>
+              <h3 className="display-5 fw-bold" style={{ color: orangeColor }}>140</h3> {/* Orange text */}
               <p className="text-muted">Recipes</p>
             </Card.Body>
           </Card>
@@ -18,7 +21,7 @@ const QuickStats = () => {
         <Col md={3} sm={6} className="mb-4">
           <Card className="border-0 shadow-sm h-100">
             <Card.Body>
-              <h3 className="display-5 fw-bold" style={{ color: '#ff6b35' }}>5.4M</h3>
+              <h3 className="display-5 fw-bold" style={{ color: orangeColor }}>5.4M</h3> {/* Orange text */}
               <p className="text-muted">Visits</p>
             </Card.Body>
           </Card>
@@ -26,7 +29,7 @@ const QuickStats = () => {
         <Col md={3} sm={6} className="mb-4">
           <Card className="border-0 shadow-sm h-100">
             <Card.Body>
-              <h3 className="display-5 fw-bold" style={{ color: '#ff6b35' }}>21.8K</h3>
+              <h3 className="display-5 fw-bold" style={{ color: orangeColor }}>21.8K</h3> {/* Orange text */}
               <p className="text-muted">Average price</p>
             </Card.Body>
           </Card>
@@ -34,7 +37,7 @@ const QuickStats = () => {
         <Col md={3} sm={6} className="mb-4">
           <Card className="border-0 shadow-sm h-100">
             <Card.Body>
-              <h3 className="display-5 fw-bold" style={{ color: '#ff6b35' }}>4.2 ★</h3>
+              <h3 className="display-5 fw-bold" style={{ color: orangeColor }}>4.2 ★</h3> {/* Orange text */}
               <p className="text-muted">Reviews</p>
             </Card.Body>
           </Card>
