@@ -9,6 +9,12 @@ const UserProfile = () => {
     dietaryPreferences: ["Vegan"],
   };
 
+  const contributedRecipes = [
+    { title: "Toaster Veggie Melt", id: 1, tag: "Vegan" },
+    { title: "Garlic Toast Pasta", id: 2, tag: "30 min" },
+    { title: "Cheesy Quesadilla", id: 3, tag: "15 min" },
+  ];
+
   return (
     <main className="min-vh-100 d-flex flex-column">
       <Container
@@ -52,6 +58,44 @@ const UserProfile = () => {
             </Col>
           </Row>
         </Card>
+
+        {/* CONTRIBUTED RECIPES */}
+        <h5 className="userprofile-section-title mb-3">Contributed Recipes</h5>
+
+        <Row className="g-3 mb-4">
+          {contributedRecipes.map((recipe) => (
+            <Col key={recipe.id} xs={12} md={4}>
+              <Card className="shadow-sm userprofile-card h-100">
+                <div
+                  className="userprofile-card-accent d-flex align-items-center justify-content-center"
+                  style={{ height: "120px" }}
+                >
+                  Image of {recipe.title}
+                </div>
+
+                <div className="p-3">
+                  <Badge className="mb-2 userprofile-badge">{recipe.tag}</Badge>
+
+                  <h6 className="userprofile-card-title mt-1">{recipe.title}</h6>
+
+                  <div className="d-flex gap-2 mt-2">
+                    <Button href={`/recipes/${recipe.id}`} variant="outline-dark" size="sm">
+                      View
+                    </Button>
+
+                    <Button
+                      href={`/recipes/${recipe.id}/edit`}
+                      size="sm"
+                      className="userprofile-primary-accent border-0"
+                    >
+                      Edit
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       </Container>
     </main>
   );
