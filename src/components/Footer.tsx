@@ -6,7 +6,7 @@ const Footer = () => (
     <Container>
       <Row className="justify-content-center text-center">
         <Col xs={12} md={8} lg={6}>
-          <h5 className="fw-bold" style={{ color: 'white' }}>Club Oven Lovin'</h5> {/* White text */}
+          <h5 className="fw-bold" style={{ color: 'white' }}>Club Oven Lovin&#39;</h5> {/* White text */}
           <p className="mb-0" style={{ color: 'white' }}> {/* White text */}
             Department of Information and Computer Sciences
             <br />

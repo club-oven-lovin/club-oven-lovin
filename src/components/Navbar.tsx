@@ -3,9 +3,8 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { usePathname } from 'next/navigation';
 import { Container, Nav, Navbar, NavDropdown, Button } from 'react-bootstrap';
-import { BoxArrowRight, Lock, PersonFill, PersonPlusFill } from 'react-bootstrap-icons';
+import { BoxArrowRight, Lock } from 'react-bootstrap-icons';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -14,7 +13,6 @@ const NavBar: React.FC = () => {
   const currentUser = session?.user?.email;
   const userWithRole = session?.user as { email: string; randomKey: string };
   const role = userWithRole?.randomKey;
-  const pathName = usePathname();
   
   const primaryOrange = '#ff6b35'; // The exact orange from the Hero section button
   const whiteColor = 'white';
