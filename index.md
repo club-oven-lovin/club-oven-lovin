@@ -12,7 +12,7 @@ nextjs-application-template is a sample Next.js 14 application that illustrates:
 
 The goal of this template is to help you get quickly started doing Next.js development by providing a reasonable directory structure for development and deployment, a set of common extensions to the core framework, and boilerplate code to implement basic page display, navigation, forms, roles, and database manipulation.
 
-To keep this codebase simple and small, some important capabilities are intentionally excluded from this template:
+To keep this codebase simple and small, some important capabilities are intentionally excluded
 
 - Unit Testing
 - Security
