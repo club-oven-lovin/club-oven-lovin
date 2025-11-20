@@ -69,7 +69,7 @@ $
 
 ```
 
-Then seed the database with the `/config/settings.development.json` data using `npx prisma db seed`.
+Then seed the database with the `/config/settings.development.json` data using `
 
 ```
 

@@ -54,3 +54,59 @@ body {
   background-color: #ea580c !important;
   border-color: #ea580c !important;
 }
+
+
+/* Card header / placeholder image background */
+.userprofile-card-accent {
+  background-color: #d6f5f0 !important; /* mint */
+  color: #333 !important;
+}
+
+/* Orange button / badge primary accent */
+.userprofile-primary-accent {
+  background-color: #f97316 !important; /* orange */
+  color: white !important;
+  border-color: #f97316 !important;
+}
+
+/* Orange hover state */
+.userprofile-primary-accent:hover {
+  background-color: #ea580c !important; /* darker orange */
+  border-color: #ea580c !important;
+  color: white !important;
+}
+
+/* Profile circular avatar placeholder */
+.userprofile-avatar {
+  background-color: #f97316 !important; /* orange */
+  color: white !important;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Badge styling */
+.userprofile-badge {
+  background-color: #f97316 !important; /* orange */
+  color: white !important;
+  font-size: 0.85rem;
+}
+
+/* Section titles */
+.userprofile-section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Card title styling */
+.userprofile-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* General rounded card styling */
+.userprofile-card {
+  border-radius: 1rem;
+  overflow: hidden;
+}
