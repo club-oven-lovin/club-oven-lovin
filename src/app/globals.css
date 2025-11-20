@@ -22,35 +22,30 @@ body {
 }
 
 .signin-page {
-  min-height: 100vh;              
-  display: flex;
-  align-items: center;             
-  justify-content: center;         
-  background-color: #fff8f1;       
+  min-height: 100vh;                       
+  background-color: #fff8f1;  
+  padding-top: 4rem;
+
 }
 
 .change-password-page {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #fff8f1;  
+  background-color: #fff8f1;
+  padding-top: 4rem;
 }
 
 .signout-page {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background-color: #fff8f1; 
+  padding-top: 4rem;
+
 }
 
 .signup-page {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background-color: #fff8f1; 
+  padding-top: 4rem;
+
 }
 /* Navbar Styles */
 .navbar {
