@@ -75,8 +75,7 @@ Then seed the database with the `/config/settings.development.json` data using `
 
 $ npx prisma db seed
 Environment variables loaded from .env
-Running seed command `ts-node --compiler-options {"module":"CommonJS"} prisma/seed.ts` ...
-Seeding the database
+Running seed command `ts-node --compiler-options {"module":"CommonJS"} prisma/seed.ts
 Creating user: admin@foo.com with role: ADMIN
 Creating user: john@foo.com with role: USER
 Adding stuff: Basket (john@foo.com)
