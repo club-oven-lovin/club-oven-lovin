@@ -11,10 +11,8 @@ type SignUpForm = {
   email: string;
   password: string;
   confirmPassword: string;
-  // acceptTerms: boolean;
 };
 
-/** The sign up page. */
 const SignUp = () => {
   const validationSchema = Yup.object().shape({
     email: Yup.string().required('Email is required').email('Email is invalid'),
@@ -37,14 +35,12 @@ const SignUp = () => {
   });
 
   const onSubmit = async (data: SignUpForm) => {
-    // console.log(JSON.stringify(data, null, 2));
     await createUser(data);
-    // After creating, signIn with redirect to the add page
     await signIn('credentials', { callbackUrl: '/add', ...data });
   };
 
   return (
-    <main>
+    <main className="signup-page">
       <Container>
         <Row className="justify-content-center">
           <Col xs={5}>
@@ -71,6 +67,7 @@ const SignUp = () => {
                     />
                     <div className="invalid-feedback">{errors.password?.message}</div>
                   </Form.Group>
+
                   <Form.Group className="form-group">
                     <Form.Label>Confirm Password</Form.Label>
                     <input
@@ -80,6 +77,7 @@ const SignUp = () => {
                     />
                     <div className="invalid-feedback">{errors.confirmPassword?.message}</div>
                   </Form.Group>
+
                   <Form.Group className="form-group py-3">
                     <Row>
                       <Col>
@@ -97,8 +95,7 @@ const SignUp = () => {
                 </Form>
               </Card.Body>
               <Card.Footer>
-                Already have an account?
-                <a href="/auth/signin">Sign in</a>
+                Already have an account? <a href="/auth/signin">Sign in</a>
               </Card.Footer>
             </Card>
           </Col>

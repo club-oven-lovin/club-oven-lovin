@@ -14,7 +14,7 @@ const SignIn = () => {
     const email = target.email.value;
     const password = target.password.value;
     const result = await signIn('credentials', {
-      callbackUrl: '/list',
+      callbackUrl: '/',
       email,
       password,
     });
@@ -25,7 +25,7 @@ const SignIn = () => {
   };
 
   return (
-    <main>
+    <main className="signin-page">
       <Container>
         <Row className="justify-content-center">
           <Col xs={5}>

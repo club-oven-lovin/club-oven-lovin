@@ -3,64 +3,104 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { usePathname } from 'next/navigation';
-import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
-import { BoxArrowRight, Lock, PersonFill, PersonPlusFill } from 'react-bootstrap-icons';
+import { Container, Nav, Navbar, NavDropdown, Button } from 'react-bootstrap';
+import { BoxArrowRight, Lock } from 'react-bootstrap-icons';
+import Link from 'next/link';
+import Image from 'next/image';
 
 const NavBar: React.FC = () => {
   const { data: session } = useSession();
   const currentUser = session?.user?.email;
   const userWithRole = session?.user as { email: string; randomKey: string };
   const role = userWithRole?.randomKey;
-  const pathName = usePathname();
+  
+  const primaryOrange = '#ff6b35'; // The exact orange from the Hero section button
+  const whiteColor = 'white';
+
   return (
-    <Navbar bg="light" expand="lg">
+    <Navbar expand="lg" className="shadow-sm py-3" style={{ backgroundColor: primaryOrange }}> {/* Orange background */}
       <Container>
-        <Navbar.Brand href="/">Next.js Application Template</Navbar.Brand>
+        <Navbar.Brand href="/" className="d-flex align-items-center">
+          <Image 
+            src="/images/club-oven-lovin-logo.png" 
+            alt="Club Oven Lovin'"
+            width={40} 
+            height={40}
+            className="me-2"
+          />
+          <span className="fw-bold" style={{ color: whiteColor }}> {/* White text */}
+            Club Oven Lovin&apos;
+          </span>
+        </Navbar.Brand>
+        
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto justify-content-start">
-            {currentUser
-              ? [
-                  <Nav.Link id="add-stuff-nav" href="/add" key="add" active={pathName === '/add'}>
-                    Add Stuff
-                  </Nav.Link>,
-                  <Nav.Link id="list-stuff-nav" href="/list" key="list" active={pathName === '/list'}>
-                    List Stuff
-                  </Nav.Link>,
-                ]
-              : ''}
-            {currentUser && role === 'ADMIN' ? (
-              <Nav.Link id="admin-stuff-nav" href="/admin" key="admin" active={pathName === '/admin'}>
+          <Nav className="ms-auto align-items-center">
+            <Nav.Link href="/" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}> {/* White text with inline style */}
+              Home
+            </Nav.Link>
+            <Nav.Link href="/browse-recipie" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
+              Recipes
+            </Nav.Link>
+            <Nav.Link href="/vendors" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
+              Vendors
+            </Nav.Link>
+            
+            {currentUser && (
+              <Nav.Link href="/add-recipe" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
+                Add Recipe
+              </Nav.Link>
+            )}
+            
+            {currentUser && role === 'ADMIN' && (
+              <Nav.Link href="/admin" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
                 Admin
               </Nav.Link>
-            ) : (
-              ''
             )}
           </Nav>
-          <Nav>
+          
+          <Nav className="align-items-center">
             {session ? (
-              <NavDropdown id="login-dropdown" title={currentUser}>
+              <NavDropdown 
+                id="login-dropdown" 
+                title={<span style={{ color: whiteColor }}>{currentUser}</span>} // White text for dropdown title
+                className="mx-2 nav-dropdown-white-text"
+              >
                 <NavDropdown.Item id="login-dropdown-sign-out" href="/api/auth/signout">
                   <BoxArrowRight />
+                  {' '}
                   Sign Out
                 </NavDropdown.Item>
                 <NavDropdown.Item id="login-dropdown-change-password" href="/auth/change-password">
                   <Lock />
+                  {' '}
                   Change Password
                 </NavDropdown.Item>
               </NavDropdown>
             ) : (
-              <NavDropdown id="login-dropdown" title="Login">
-                <NavDropdown.Item id="login-dropdown-sign-in" href="/auth/signin">
-                  <PersonFill />
-                  Sign in
-                </NavDropdown.Item>
-                <NavDropdown.Item id="login-dropdown-sign-up" href="/auth/signup">
-                  <PersonPlusFill />
-                  Sign up
-                </NavDropdown.Item>
-              </NavDropdown>
+              <>
+                <Nav.Link href="/auth/signin" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}> {/* White text */}
+                  Sign In
+                </Nav.Link>
+                <Link href="/auth/signup" legacyBehavior>
+                  <Button
+                    as="a"
+                    style={{
+                      backgroundColor: whiteColor, // White background
+                      borderColor: whiteColor,
+                      color: primaryOrange, // Orange text
+                      borderRadius: '20px',
+                      padding: '8px 24px',
+                      marginLeft: '10px',
+                      fontWeight: '600'
+                    }}
+                    className="btn-signup-navbar" // Custom class for its specific hover
+                  >
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
             )}
           </Nav>
         </Navbar.Collapse>
