@@ -37,15 +37,13 @@ async function main() {
     });
   }
 
-  // --------------------------------------------------
-  // 3. Seed VENDORS (NEW)
-  // --------------------------------------------------
+  // Seed VENDORS
   if (config.defaultVendors) {
     for (const vendor of config.defaultVendors) {
       console.log(`  Creating vendor for: ${vendor.owner}`);
 
       await prisma.vendor.upsert({
-        where: { owner: vendor.owner }, // owner must be unique!
+        where: { owner: vendor.owner },
         update: {},
         create: {
           owner: vendor.owner,
@@ -57,9 +55,7 @@ async function main() {
     }
   }
 
-  // --------------------------------------------------
-  // 4. Seed INGREDIENTS (NEW)
-  // --------------------------------------------------
+  // Seed INGREDIENTS
   if (config.defaultIngredients) {
     for (const ing of config.defaultIngredients) {
       console.log(`  Creating ingredient: ${ing.name}`);
