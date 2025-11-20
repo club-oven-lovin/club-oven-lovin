@@ -15,6 +15,12 @@ const UserProfile = () => {
     { title: "Cheesy Quesadilla", id: 3, tag: "15 min" },
   ];
 
+  const favoriteRecipes = [
+    { title: "Berry Oat Bars", id: 4, tag: "Breakfast" },
+    { title: "Chipotle Tacos", id: 5, tag: "Trending" },
+    { title: "Creamy Garlic Pasta", id: 6, tag: "Comfort" },
+  ];
+
   return (
     <main className="min-vh-100 d-flex flex-column">
       <Container
@@ -91,6 +97,39 @@ const UserProfile = () => {
                       Edit
                     </Button>
                   </div>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+
+        {/* FAVORITE RECIPES */}
+        <h5 className="userprofile-section-title mb-3">Favorite Recipes</h5>
+
+        <Row className="g-3">
+          {favoriteRecipes.map((recipe) => (
+            <Col key={recipe.id} xs={12} md={4}>
+              <Card className="shadow-sm userprofile-card h-100">
+                <div
+                  className="userprofile-card-accent d-flex align-items-center justify-content-center"
+                  style={{ height: "120px" }}
+                >
+                  Image of {recipe.title}
+                </div>
+
+                <div className="p-3">
+                  <Badge className="mb-2 userprofile-badge">{recipe.tag}</Badge>
+
+                  <h6 className="userprofile-card-title mt-1">{recipe.title}</h6>
+
+                  <Button
+                    href={`/recipes/${recipe.id}`}
+                    variant="outline-dark"
+                    size="sm"
+                    className="mt-2"
+                  >
+                    View
+                  </Button>
                 </div>
               </Card>
             </Col>
