@@ -16,10 +16,14 @@ type HeroSectionProps = {
   className?: string;
 };
 
-export function HeroSection({ className }: HeroSectionProps) {
+export function HeroSection({ className }: 
+HeroSectionProps) {
+  const creamColor = '#fff8f1'
+  
   return (
     <section
-      className={`w-full bg-slate-50 py-16 px-6 md:px-10 ${className ?? ""}`}
+      className={`w-full py-16 px-6 md:px-10 ${className ?? ""}`}
+      style={{ backgroundColor: creamColor }}
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-center md:gap-16">
         <div className="order-2 space-y-6 text-slate-800 md:order-1 md:flex-1">

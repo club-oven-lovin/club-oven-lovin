@@ -9,7 +9,7 @@ import Providers from './providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Toaster Oven Lovin\' - Cook Smart, Eat Well, Save Money',
+  title: 'Club Oven Lovin\' - Cook Smart, Eat Well, Save Money',
   description: 'Discover delicious recipes designed for college students with limited kitchens, tight budgets, and busy schedules.',
 };
 

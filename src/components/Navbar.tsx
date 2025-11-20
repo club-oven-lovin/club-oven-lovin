@@ -16,19 +16,22 @@ const NavBar: React.FC = () => {
   const role = userWithRole?.randomKey;
   const pathName = usePathname();
   
+  const primaryOrange = '#ff6b35'; // The exact orange from the Hero section button
+  const whiteColor = 'white';
+
   return (
-    <Navbar bg="white" expand="lg" className="shadow-sm py-3">
+    <Navbar expand="lg" className="shadow-sm py-3" style={{ backgroundColor: primaryOrange }}> {/* Orange background */}
       <Container>
         <Navbar.Brand href="/" className="d-flex align-items-center">
           <Image 
             src="/images/club-oven-lovin-logo.png" 
-            alt="Toaster Oven Lovin'" 
+            alt="Club Oven Lovin'"
             width={40} 
             height={40}
             className="me-2"
           />
-          <span className="fw-bold" style={{ color: '#1a5f4f' }}>
-            Toaster Oven Lovin&apos;
+          <span className="fw-bold" style={{ color: whiteColor }}> {/* White text */}
+            Club Oven Lovin&apos;
           </span>
         </Navbar.Brand>
         
@@ -36,24 +39,24 @@ const NavBar: React.FC = () => {
         
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto align-items-center">
-            <Nav.Link href="/" className="mx-2 nav-link-custom">
+            <Nav.Link href="/" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}> {/* White text with inline style */}
               Home
             </Nav.Link>
-            <Nav.Link href="/browse-recipie" className="mx-2 nav-link-custom">
+            <Nav.Link href="/browse-recipie" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
               Recipes
             </Nav.Link>
-            <Nav.Link href="/vendors" className="mx-2 nav-link-custom">
+            <Nav.Link href="/vendors" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
               Vendors
             </Nav.Link>
             
             {currentUser && (
-              <Nav.Link href="/add-recipe" className="mx-2 nav-link-custom">
+              <Nav.Link href="/add-recipe" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
                 Add Recipe
               </Nav.Link>
             )}
             
             {currentUser && role === 'ADMIN' && (
-              <Nav.Link href="/admin" className="mx-2 nav-link-custom">
+              <Nav.Link href="/admin" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
                 Admin
               </Nav.Link>
             )}
@@ -61,7 +64,11 @@ const NavBar: React.FC = () => {
           
           <Nav className="align-items-center">
             {session ? (
-              <NavDropdown id="login-dropdown" title={currentUser} className="mx-2">
+              <NavDropdown 
+                id="login-dropdown" 
+                title={<span style={{ color: whiteColor }}>{currentUser}</span>} // White text for dropdown title
+                className="mx-2 nav-dropdown-white-text"
+              >
                 <NavDropdown.Item id="login-dropdown-sign-out" href="/api/auth/signout">
                   <BoxArrowRight />
                   {' '}
@@ -75,18 +82,22 @@ const NavBar: React.FC = () => {
               </NavDropdown>
             ) : (
               <>
-                <Nav.Link href="/auth/signin" className="mx-2 nav-link-custom">
+                <Nav.Link href="/auth/signin" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}> {/* White text */}
                   Sign In
                 </Nav.Link>
                 <Link href="/auth/signup" legacyBehavior>
                   <Button
+                    as="a"
                     style={{
-                      backgroundColor: '#ff6b35',
-                      borderColor: '#ff6b35',
+                      backgroundColor: whiteColor, // White background
+                      borderColor: whiteColor,
+                      color: primaryOrange, // Orange text
                       borderRadius: '20px',
                       padding: '8px 24px',
-                      marginLeft: '10px'
+                      marginLeft: '10px',
+                      fontWeight: '600'
                     }}
+                    className="btn-signup-navbar" // Custom class for its specific hover
                   >
                     Sign Up
                   </Button>
