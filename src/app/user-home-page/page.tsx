@@ -48,6 +48,9 @@ const recommendedRecipes = [
   },
 ];
 
+const brandColor = '#ff6b35';
+const brandAccentColor = '#ff9248';
+
 const UserHomePage = async () => {
   const session = (await getServerSession(authOptions)) as {
     user: { email: string; id: string; randomKey: string; name?: string | null };
@@ -58,11 +61,53 @@ const UserHomePage = async () => {
 
   return (
     <main className="bg-body-tertiary min-vh-100">
-      <section className="bg-primary-subtle text-center py-5 border-bottom">
+      <section
+        className="text-white py-5 border-bottom"
+        style={{ background: `linear-gradient(120deg, ${brandColor}, ${brandAccentColor})` }}
+      >
         <Container>
-          <p className="text-uppercase text-secondary mb-2">Welcome back</p>
-          <h1 className="display-4 fw-bold mb-3">Hey, {displayName}!</h1>
-          <p className="lead text-muted">Ready to dive back into your kitchen creations?</p>
+          <div className="d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
+            <div className="text-center text-lg-start">
+              <p className="text-uppercase fw-semibold opacity-75 mb-2">Welcome back</p>
+              <h1 className="display-4 fw-bold mb-3">Hey, {displayName}!</h1>
+              <p className="lead opacity-75 mb-4">
+                The oven is preheated and the community is buzzing—jump into something new or refine a favorite.
+              </p>
+              <div className="d-flex flex-column flex-sm-row gap-3">
+                <Button href="/recipes/search" variant="light" className="text-uppercase fw-semibold px-4">
+                  Browse recipes
+                </Button>
+                <Button href="/add" variant="outline-light" className="text-uppercase fw-semibold px-4 text-white">
+                  Share a new dish
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-white text-dark rounded-4 p-4 shadow-lg w-100" style={{ maxWidth: 360 }}>
+              <p className="text-uppercase text-muted fw-semibold mb-3">Your kitchen pulse</p>
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <span className="text-muted text-uppercase small">Saved recipes</span>
+                  <h3 className="display-6 fw-bold mb-0" style={{ color: brandColor }}>48</h3>
+                </div>
+                <span className="badge bg-body-secondary text-dark py-2 px-3 rounded-pill">+4 this week</span>
+              </div>
+              <div className="d-flex align-items-center gap-3">
+                <div
+                  className="rounded-circle d-flex align-items-center justify-content-center fw-bold text-uppercase"
+                  style={{ backgroundColor: 'rgba(255, 107, 53, 0.15)', color: brandColor, width: 56, height: 56 }}
+                >
+                  Hot
+                </div>
+                <div>
+                  <p className="fw-semibold mb-1">Tonight&apos;s inspiration</p>
+                  <p className="text-muted small mb-0">
+                    Smoky chipotle tacos are trending—give them a whirl or pick your next hero recipe.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </Container>
       </section>
 
