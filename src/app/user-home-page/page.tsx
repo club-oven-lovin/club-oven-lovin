@@ -54,7 +54,7 @@ const UserHomePage = async () => {
   } | null;
 
   loggedInProtectedPage(session);
-  const displayName = session?.user?.name ?? 'Miron';
+  const displayName = session?.user?.name ?? 'user';
 
   return (
     <main className="bg-body-tertiary min-vh-100">
