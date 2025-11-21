@@ -18,7 +18,6 @@ To keep this codebase simple and small, some important capabilities are intentio
 - Security
 - Deployment
 
-Examples of the these capabilities will be provided elsewhere.
 
 ## Installation
 
