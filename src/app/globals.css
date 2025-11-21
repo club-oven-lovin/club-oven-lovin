@@ -29,6 +29,32 @@ body {
   flex-direction: column;
 }
 
+.signin-page {
+  min-height: 100vh;                      
+  background-color: #fff8f1;  
+  padding-top: 4rem;     
+}
+
+.change-password-page {
+  min-height: 100vh;
+  background-color: #fff8f1;  
+  padding-top: 4rem;
+}
+
+.signout-page {
+  min-height: 100vh;
+  background-color: #fff8f1; 
+  padding-top: 4rem;
+
+}
+
+.signup-page {
+  min-height: 100vh;
+  background-color: #fff8f1; 
+  padding-top: 4rem;
+
+}
+
 /* Vendor */
 .vendor-homepage-greeting-card {
   color: #0b5e57 !important;           /* darker teal text */
