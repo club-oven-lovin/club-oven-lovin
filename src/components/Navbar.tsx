@@ -13,6 +13,7 @@ const NavBar: React.FC = () => {
   const currentUser = session?.user?.email;
   const userWithRole = session?.user as { email: string; randomKey: string };
   const role = userWithRole?.randomKey;
+  const homeHref = currentUser ? '/user-home-page' : '/';
   
   const primaryOrange = '#ff6b35'; // The exact orange from the Hero section button
   const whiteColor = 'white';
@@ -20,7 +21,7 @@ const NavBar: React.FC = () => {
   return (
     <Navbar expand="lg" className="shadow-sm py-3" style={{ backgroundColor: primaryOrange }}> {/* Orange background */}
       <Container>
-        <Navbar.Brand href="/" className="d-flex align-items-center">
+        <Navbar.Brand href={homeHref} className="d-flex align-items-center">
           <Image 
             src="/images/club-oven-lovin-logo.png" 
             alt="Club Oven Lovin'"
@@ -37,7 +38,7 @@ const NavBar: React.FC = () => {
         
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto align-items-center">
-            <Nav.Link href="/" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}> {/* White text with inline style */}
+            <Nav.Link href="/user-home-page" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}> {/* White text with inline style */}
               Home
             </Nav.Link>
             <Nav.Link href="/browse-recipie" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
