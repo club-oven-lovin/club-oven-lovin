@@ -32,6 +32,33 @@ export async function addStuff(stuff: { name: string; quantity: number; owner: s
 }
 
 /**
+ * Creates a new recipe.
+ */
+export async function addRecipe(recipe: {
+  name: string;
+  image: string;
+  ingredients: string;
+  steps: string;
+  tags: string;
+  dietaryRestrictions: string[];
+  owner: string;
+}) {
+  await prisma.recipe.create({
+    data: {
+      name: recipe.name,
+      image: recipe.image,
+      ingredients: recipe.ingredients,
+      steps: recipe.steps,
+      tags: recipe.tags.split(",").map(t => t.trim()),
+      dietaryRestrictions: recipe.dietaryRestrictions,
+      owner: recipe.owner,
+    },
+  });
+
+  redirect("/recipes");
+}
+
+/**
  * Edits an existing stuff in the database.
  * @param stuff, an object with the following properties: id, name, quantity, owner, condition.
  */
