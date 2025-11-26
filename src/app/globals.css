@@ -58,17 +58,16 @@ body {
 
 /* Vendor */
 .vendor-homepage-greeting-card {
-  color: #0b5e57 !important;           /* darker teal text */
+  color: #0b5e57 !important;
 }
 
 .vendor-homepage-greeting-card .card-title,
 .vendor-homepage-greeting-card .card-text {
-  color: #0b5e57 !important; /* ensure text is dark teal */
+  color: #0b5e57 !important;
 }
 
-/* Vendor table header text color */
 .vendor-homepage-table thead th {
-  background-color: #d6f5f0 !important; /* light mint */
+  background-color: #d6f5f0 !important;
 }
 
 .vendor-homepage-orange-btn {
@@ -83,29 +82,26 @@ body {
 }
 
 
-/* Card header / placeholder image background */
+/* User Profile */
 .userprofile-card-accent {
-  background-color: #d6f5f0 !important; /* mint */
+  background-color: #d6f5f0 !important;
   color: #333 !important;
 }
 
-/* Orange button / badge primary accent */
 .userprofile-primary-accent {
-  background-color: #f97316 !important; /* orange */
+  background-color: #f97316 !important;
   color: white !important;
   border-color: #f97316 !important;
 }
 
-/* Orange hover state */
 .userprofile-primary-accent:hover {
   background-color: #ea580c !important; /* darker orange */
   border-color: #ea580c !important;
   color: white !important;
 }
 
-/* Profile circular avatar placeholder */
 .userprofile-avatar {
-  background-color: #f97316 !important; /* orange */
+  background-color: #f97316 !important;
   color: white !important;
   border-radius: 50%;
   display: flex;
@@ -113,27 +109,45 @@ body {
   justify-content: center;
 }
 
-/* Badge styling */
 .userprofile-badge {
-  background-color: #f97316 !important; /* orange */
+  background-color: #f97316 !important;
   color: white !important;
   font-size: 0.85rem;
 }
 
-/* Section titles */
 .userprofile-section-title {
   font-size: 1.2rem;
   font-weight: 600;
 }
 
-/* Card title styling */
 .userprofile-card-title {
   font-size: 1rem;
   font-weight: 600;
 }
 
-/* General rounded card styling */
 .userprofile-card {
   border-radius: 1rem;
   overflow: hidden;
+}
+
+/* AddRecipeForm */
+.add-recipe-submit-btn {
+  background-color: #f97316 !important;
+  border-color: #f97316 !important;
+  color: white !important;
+}
+
+.add-recipe-submit-btn:hover {
+  background-color: #ea580c !important;
+}
+
+.add-recipe-reset-btn {
+  background-color: #3fc1b0 !important;
+  border-color: #3fc1b0 !important;
+  color: white !important;
+}
+
+.add-recipe-reset-btn:hover {
+  background-color: #0b5e57 !important;
+  color: white !important;
 }

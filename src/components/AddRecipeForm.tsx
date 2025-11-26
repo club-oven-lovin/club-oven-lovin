@@ -64,7 +64,13 @@ export default function AddRecipeForm() {
     <Container className="py-3">
       <Row className="justify-content-center">
         <Col xs={10}>
-          <h2 className="text-center">Add New Recipe</h2>
+          <h2 className="text-center mt-4 mb-2 display-5">
+            Create Your Culinary Masterpiece
+          </h2>
+
+          <p className="text-center mb-4" style={{ fontSize: "1.1rem", color: "#555" }}>
+            Tell us how you make your dish, including the ingredients, steps, and tips. Your recipe could be someone’s new favorite meal!
+          </p>
           <Card>
             <Card.Body>
               <Form onSubmit={handleSubmit(onSubmit)}>
