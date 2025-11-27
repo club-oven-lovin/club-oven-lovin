@@ -12,7 +12,7 @@ export type EditProfileFormData = {
   id: string;
   name: string;
   email: string;
-  image: string; // always string
+  image: string;
   dietaryRestrictions: string[];
 };
 
@@ -44,9 +44,9 @@ const EditUserProfileForm = ({ user }: { user: User & { dietaryRestrictions: str
     <Container className="py-3">
       <Row className="justify-content-center">
         <Col xs={6}>
-          <Col className="text-center mb-2">
-            <h2>Edit Profile</h2>
-            <p className="text-muted">Keep your info up-to-date so others can find you!</p>
+          <Col className="text-center">
+            <h2 className="mt-4 mb-2 display-5">Edit Your Profile</h2>
+            <p className="text-muted mb-4" style={{ fontSize: "1.1rem" }}>Keep your profile up-to-date!</p>
           </Col>
 
           <Card>
@@ -112,7 +112,7 @@ const EditUserProfileForm = ({ user }: { user: User & { dietaryRestrictions: str
                 {/* BUTTONS */}
                 <Row className="pt-2">
                   <Col>
-                    <Button type="submit" variant="primary">
+                    <Button type="submit" variant="primary" className="edit-user-profile-save-btn">
                       Save
                     </Button>
                   </Col>
@@ -120,7 +120,7 @@ const EditUserProfileForm = ({ user }: { user: User & { dietaryRestrictions: str
                     <Button
                       type="button"
                       variant="secondary"
-                      className="float-end"
+                      className="float-end edit-user-profile-reset-btn"
                       onClick={() => reset()}
                     >
                       Reset
