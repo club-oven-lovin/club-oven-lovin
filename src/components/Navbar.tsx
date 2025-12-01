@@ -29,7 +29,7 @@ const NavBar: React.FC = () => {
             height={40}
             className="me-2"
           />
-          <span className="fw-bold" style={{ color: whiteColor }}> {/* White text */}
+          <span className="fw-bold" style={{ color: whiteColor }}> {/* This makes the brand text white */}
             Club Oven Lovin&apos;
           </span>
         </Navbar.Brand>
@@ -38,10 +38,10 @@ const NavBar: React.FC = () => {
         
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto align-items-center">
-            <Nav.Link href="/user-home-page" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}> {/* White text with inline style */}
+            <Nav.Link href="/user-home-page" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}> {/* White text, light grey hover */}
               Home
             </Nav.Link>
-            <Nav.Link href="/browse-recipie" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
+            <Nav.Link href="/browse-recipes" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
               Recipes
             </Nav.Link>
             <Nav.Link href="/vendors" className="mx-2 nav-link-white-orange-hover" style={{ color: whiteColor }}>
