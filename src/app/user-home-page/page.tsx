@@ -14,7 +14,7 @@ const actionButtons = [
   },
   {
     label: 'Add New Recipe',
-    href: '/add',
+    href: "/add-recipe",
     description: 'Document your latest win with smart fields and auto-tagging.',
     accentStart: '#fff1ea',
     accentEnd: '#ffc8a5',
