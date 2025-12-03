@@ -29,7 +29,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
   return (
     <Card
-      className="h-100 shadow-sm border-0 recipe-card-custom"
+      className="shadow-sm border-0 recipe-card-custom"
       data-testid={`recipe-card-${recipe.id}`}
     >
       <div className="recipe-card-image-container">
@@ -43,13 +43,13 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         />
       </div>
 
-      <Card.Body className="d-flex flex-column">
+      <Card.Body>
         <Card.Title className="fw-bold fs-6 mb-1" style={{ color: '#343a40' }}>
           {recipe.name}
         </Card.Title>
 
         {/* Rating / Time */}
-        <div className="d-flex align-items-center mb-2">
+        <div className="d-flex align-items-center mb-3">
           {Array.from({ length: rating }).map((_, i) => (
             <StarFill key={i} size={14} className="me-1" style={{ color: primaryOrange }} />
           ))}
@@ -59,25 +59,29 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         </div>
 
         {/* Tags */}
-        <div className="mb-1">
-          {tags.map((tag) => (
-            <Badge key={tag} bg="warning" className="me-1 text-dark">
-              {tag}
-            </Badge>
-          ))}
-        </div>
+        {tags.length > 0 && (
+          <div className="mb-1">
+            {tags.map((tag) => (
+              <Badge key={tag} bg="warning" className="me-1 text-dark">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
 
         {/* Dietary Restrictions */}
-        <div className="mb-2">
-          {dietaryRestrictions.map((d) => (
-            <Badge key={d} bg="success" className="me-1">
-              {d}
-            </Badge>
-          ))}
-        </div>
+        {dietaryRestrictions.length > 0 && (
+          <div className="mb-1">
+            {dietaryRestrictions.map((d) => (
+              <Badge key={d} bg="success" className="me-1">
+                {d}
+              </Badge>
+            ))}
+          </div>
+        )}
 
         {/* Price */}
-        <Card.Text className="mt-auto fw-bold" style={{ color: primaryOrange }}>
+        <Card.Text className="fw-bold" style={{ color: primaryOrange }}>
           {price}
         </Card.Text>
       </Card.Body>
