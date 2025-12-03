@@ -1,6 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { test as base, Page, request } from '@playwright/test';
-import type { StorageState } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 import { PrismaClient, Role } from '@prisma/client';
@@ -106,6 +105,9 @@ async function loginViaApi(
     await requestContext.dispose();
   }
 }
+
+type RequestContextOptions = Parameters<typeof request.newContext>[0];
+type StorageState = NonNullable<RequestContextOptions>['storageState'];
 
 async function ensureStorageState(
   email: string,
