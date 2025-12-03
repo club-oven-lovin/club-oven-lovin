@@ -35,7 +35,10 @@ const UserProfile = () => {
         }}
       >
         {/* PROFILE CARD */}
-        <Card className="shadow-sm p-4 mb-4 userprofile-card">
+        <Card
+          className="shadow-sm p-4 mb-4 userprofile-card"
+          data-testid="profile-card"
+        >
           <Row className="align-items-center">
             <Col md="auto" className="text-center mb-3 mb-md-0">
               <div
@@ -66,12 +69,17 @@ const UserProfile = () => {
         </Card>
 
         {/* CONTRIBUTED RECIPES */}
-        <h5 className="userprofile-section-title mb-3">Contributed Recipes</h5>
+        <h5
+          className="userprofile-section-title mb-3"
+          data-testid="contributed-heading"
+        >
+          Contributed Recipes
+        </h5>
 
         <Row className="g-3 mb-4">
           {contributedRecipes.map((recipe) => (
             <Col key={recipe.id} xs={12} md={4}>
-              <Card className="shadow-sm userprofile-card h-100">
+              <Card className="shadow-sm userprofile-card h-100" data-testid={`contributed-card-${recipe.id}`}>
                 <div
                   className="userprofile-card-accent d-flex align-items-center justify-content-center"
                   style={{ height: "120px" }}
@@ -104,12 +112,17 @@ const UserProfile = () => {
         </Row>
 
         {/* FAVORITE RECIPES */}
-        <h5 className="userprofile-section-title mb-3">Favorite Recipes</h5>
+        <h5
+          className="userprofile-section-title mb-3"
+          data-testid="favorite-heading"
+        >
+          Favorite Recipes
+        </h5>
 
         <Row className="g-3">
           {favoriteRecipes.map((recipe) => (
             <Col key={recipe.id} xs={12} md={4}>
-              <Card className="shadow-sm userprofile-card h-100">
+              <Card className="shadow-sm userprofile-card h-100" data-testid={`favorite-card-${recipe.id}`}>
                 <div
                   className="userprofile-card-accent d-flex align-items-center justify-content-center"
                   style={{ height: "120px" }}

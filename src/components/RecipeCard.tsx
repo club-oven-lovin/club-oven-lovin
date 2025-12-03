@@ -5,35 +5,40 @@
 import Image from 'next/image';
 import { Card, Badge } from 'react-bootstrap';
 import { StarFill } from 'react-bootstrap-icons';
-import type { Recipe } from '@/lib/recipeData'; // Now importing only the updated Recipe interface
+import type { Recipe as MarketingRecipe } from '@/lib/recipeData';
+import type { Recipe as PrismaRecipe } from '@prisma/client';
 
-// We no longer need the union type as we are consistently using Prisma data
-type RecipeType = Recipe;
+type RecipeCardRecipe = MarketingRecipe | PrismaRecipe;
 
 interface RecipeCardProps {
-  recipe: RecipeType;
+  recipe: RecipeCardRecipe;
 }
+
+const hasMarketingFields = (recipe: RecipeCardRecipe): recipe is MarketingRecipe =>
+  'rating' in recipe && 'time' in recipe && 'price' in recipe;
+
+const hasDietaryData = (recipe: RecipeCardRecipe): recipe is PrismaRecipe =>
+  'tags' in recipe && 'dietaryRestrictions' in recipe;
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const primaryOrange = '#ff6b35';
 
-  // These fields are now handled based on the Recipe interface from the database.
-  // 'rating' and 'time' are optional, so provide defaults if not present.
-  const rating = recipe.rating ?? 5; // Default to 5 stars if rating is not provided
-  const time = recipe.time ?? 'N/A'; // Default to 'N/A' if time is not provided
-  const tags = recipe.tags || []; // Ensure tags is an array, default to empty
-  const dietaryRestrictions = recipe.dietaryRestrictions || []; // Ensure dietaryRestrictions is an array, default to empty
-
-  // Provide a fallback image if recipe.image is empty or null
-  const imageUrl = recipe.image || '/images/placeholder-recipe.png'; // Use a placeholder if no image URL
+  const rating = hasMarketingFields(recipe) ? recipe.rating : 5;
+  const time = hasMarketingFields(recipe) ? recipe.time : 'N/A';
+  const price = hasMarketingFields(recipe) ? recipe.price : 'USD 0.00';
+  const tags = hasDietaryData(recipe) ? recipe.tags : [];
+  const dietaryRestrictions = hasDietaryData(recipe) ? recipe.dietaryRestrictions : [];
 
   return (
-    <Card className="h-100 shadow-sm border-0 recipe-card-custom">
+    <Card
+      className="h-100 shadow-sm border-0 recipe-card-custom"
+      data-testid={`recipe-card-${recipe.id}`}
+    >
       <div className="recipe-card-image-container">
         <Image
-          src={imageUrl}
-          alt={recipe.name}
-          width={150} // Keep width and height for consistent card sizing
+          src={recipe.image || '/images/placeholder.png'}
+          alt={recipe.name || 'Recipe'}
+          width={150}
           height={150}
           className="card-img-top recipe-card-image"
           style={{ objectFit: 'cover' }}
@@ -47,38 +52,31 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
         {/* Rating / Time */}
         <div className="d-flex align-items-center mb-2">
-          {/* Display stars based on the rating (if available) */}
-          {Array(rating)
-            .fill(0)
-            .map((_, i) => (
-              <StarFill key={i} size={14} className="me-1" style={{ color: primaryOrange }} />
-            ))}
+          {Array.from({ length: rating }).map((_, i) => (
+            <StarFill key={i} size={14} className="me-1" style={{ color: primaryOrange }} />
+          ))}
           <span className="text-muted ms-auto" style={{ fontSize: '0.9em' }}>
             {time}
           </span>
         </div>
 
         {/* Tags */}
-        {tags.length > 0 && (
-          <div className="mb-1">
-            {tags.map((tag) => (
-              <Badge key={tag} bg="warning" className="me-1 text-dark">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
+        <div className="mb-1">
+          {tags.map((tag) => (
+            <Badge key={tag} bg="warning" className="me-1 text-dark">
+              {tag}
+            </Badge>
+          ))}
+        </div>
 
         {/* Dietary Restrictions */}
-        {dietaryRestrictions.length > 0 && (
-          <div className="mb-2">
-            {dietaryRestrictions.map((d) => (
-              <Badge key={d} bg="success" className="me-1">
-                {d}
-              </Badge>
-            ))}
-          </div>
-        )}
+        <div className="mb-2">
+          {dietaryRestrictions.map((d) => (
+            <Badge key={d} bg="success" className="me-1">
+              {d}
+            </Badge>
+          ))}
+        </div>
 
         {/* Removed Price display entirely */}
         {/* <Card.Text className="mt-auto fw-bold" style={{ color: primaryOrange }}>

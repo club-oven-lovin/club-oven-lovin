@@ -49,7 +49,10 @@ export default function Vendor({
     <Container className="py-4">
 
       {/* Greeting card */}
-      <Card className="vendor-homepage-greeting-card mb-4 shadow-sm">
+      <Card
+        className="vendor-homepage-greeting-card mb-4 shadow-sm"
+        data-testid="vendor-greeting-card"
+      >
         <Card.Body className="text-center">
           <Card.Title className="fs-2">
             Welcome, {vendor?.name || 'Vendor'}
@@ -62,7 +65,13 @@ export default function Vendor({
       </Card>
 
       {/* Ingredients table */}
-      <Table bordered hover responsive className="vendor-homepage-table mb-4">
+      <Table
+        bordered
+        hover
+        responsive
+        className="vendor-homepage-table mb-4"
+        data-testid="ingredients-table"
+      >
         <thead className="table-secondary">
           <tr>
             <th>Ingredient</th>
