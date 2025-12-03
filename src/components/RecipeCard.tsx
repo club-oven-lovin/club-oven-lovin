@@ -1,3 +1,5 @@
+// src/components/RecipeCard.tsx
+
 'use client';
 
 import Image from 'next/image';
@@ -83,6 +85,11 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         {/* Price */}
         <Card.Text className="fw-bold" style={{ color: primaryOrange }}>
           {price}
+        </Card.Text> */}
+
+        {/* Display owner, useful for debugging or user-specific views */}
+        <Card.Text className="text-muted mt-auto" style={{ fontSize: '0.8em' }}>
+          By: {recipe.owner}
         </Card.Text>
       </Card.Body>
     </Card>

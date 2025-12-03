@@ -17,7 +17,7 @@ export const AddRecipeSchema = Yup.object({
     .of(Yup.string().required())
     .default([])
     .required(),
-  owner: Yup.string().required(),
+  owner: Yup.string().required(), // This is the field that was causing the issue
 });
 
 export const EditStuffSchema = Yup.object({

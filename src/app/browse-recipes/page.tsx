@@ -1,4 +1,4 @@
-'use client';
+// src/app/browse-recipes/page.tsx
 
 import { useState } from 'react';
 import {

@@ -1,10 +1,10 @@
 "use client";
 
+import { useEffect } from "react"; // Added useEffect
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AddRecipeSchema } from "@/lib/validationSchemas";
-import { addRecipe } from "@/lib/dbActions";
 import { useRouter } from "next/navigation";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import LoadingSpinner from "./LoadingSpinner";
@@ -23,7 +23,8 @@ export default function AddRecipeForm() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<AddRecipeFormData>({
+  // Added getValues and setValue to the destructuring
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset, getValues, setValue } = useForm<AddRecipeFormData>({
     resolver: yupResolver(AddRecipeSchema),
     defaultValues: {
       name: "",
@@ -32,11 +33,21 @@ export default function AddRecipeForm() {
       steps: "",
       tags: "",
       dietaryRestrictions: [],
-      owner: session?.user?.email ?? "",
+      // Removed owner from defaultValues, it will be set by useEffect
     },
   });
 
-  const owner = session?.user?.email ?? "";
+  // Added console.log for Session Data
+  console.log("Session Data:", session);
+
+  // useEffect to set the owner field once session data is available
+  useEffect(() => {
+    if (session?.user?.email) {
+      setValue("owner", session.user.email);
+    }
+  }, [session, setValue]); // Dependency array includes session and setValue
+
+  const owner = session?.user?.email ?? ""; // Kept for consistency if needed elsewhere, but setValue handles the form state
 
   if (status === "loading") return <LoadingSpinner />;
   if (status === "unauthenticated") {
@@ -44,10 +55,36 @@ export default function AddRecipeForm() {
     return null;
   }
 
-  // Form submit handler
+  // Form submit handler (calls API route)
   const onSubmit = async (data: AddRecipeFormData) => {
-    await addRecipe({ ...data, owner }); // server action will redirect
+    console.log("onSubmit function called!"); // Debugging log
+    try {
+      const payload = { ...data, owner };
+      const res = await fetch('/api/recipes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Failed to create recipe');
+      }
+      // Redirect to browse page after successful create
+      router.push('/browse-recipes');
+    } catch (err) {
+      // Minimal error handling: log and alert
+      // You can replace with a nicer UI notification later
+      // eslint-disable-next-line no-console
+      console.error('Error creating recipe:', err);
+      // eslint-disable-next-line no-alert
+      alert('Could not create recipe. See console for details.');
+    }
   };
+
+  // TEMPORARY DEBUGGING LOGS - REMOVE THESE LATER
+  console.log("Form State:", { errors, isSubmitting });
+  console.log("Current Form Values:", getValues());
+  // END TEMPORARY DEBUGGING LOGS
 
   return (
     <Container className="py-4">
@@ -113,8 +150,8 @@ export default function AddRecipeForm() {
                   ))}
                 </Form.Group>
 
-                {/* hidden owner */}
-                <input type="hidden" value={owner} {...register("owner")} />
+                {/* hidden owner - removed value={owner} */}
+                <input type="hidden" {...register("owner")} />
 
                 {/* BUTTONS */}
                 <Row className="mt-4">
