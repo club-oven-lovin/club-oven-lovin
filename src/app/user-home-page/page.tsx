@@ -114,7 +114,7 @@ const UserHomePage = async () => {
                 The oven is preheated and the community is buzzing—jump into something new or refine a favorite.
               </p>
               <div className="d-flex flex-column flex-sm-row gap-3">
-                <Button href="/recipes/search" variant="light" className="text-uppercase fw-semibold px-4">
+                <Button href="browse-recipes" variant="light" className="text-uppercase fw-semibold px-4">
                   Browse recipes
                 </Button>
                 <Button href="/add-recipe" variant="outline-light" className="text-uppercase fw-semibold px-4 text-white">

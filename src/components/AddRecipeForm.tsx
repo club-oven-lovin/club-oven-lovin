@@ -62,18 +62,21 @@ export default function AddRecipeForm() {
         <Col md={10}>
           <Card>
             <Card.Body>
-              <Form onSubmit={handleSubmit(onSubmit)}>
+              <Form
+                onSubmit={handleSubmit(onSubmit)}
+                data-testid="add-recipe-form"
+              >
                 {/* NAME + IMAGE */}
                 <Row>
                   <Col>
-                    <Form.Group>
+                    <Form.Group data-testid="recipe-name-field">
                       <Form.Label>Recipe Name</Form.Label>
                       <Form.Control type="text" {...register("name")} isInvalid={!!errors.name} />
                       <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
                     </Form.Group>
                   </Col>
                   <Col>
-                    <Form.Group>
+                    <Form.Group data-testid="recipe-image-field">
                       <Form.Label>Picture URL</Form.Label>
                       <Form.Control type="text" {...register("image")} isInvalid={!!errors.image} />
                       <Form.Control.Feedback type="invalid">{errors.image?.message}</Form.Control.Feedback>
@@ -82,28 +85,28 @@ export default function AddRecipeForm() {
                 </Row>
 
                 {/* INGREDIENTS */}
-                <Form.Group className="mt-3">
+                <Form.Group className="mt-3" data-testid="recipe-ingredients-field">
                   <Form.Label>Ingredients</Form.Label>
                   <Form.Control as="textarea" rows={4} {...register("ingredients")} isInvalid={!!errors.ingredients} />
                   <Form.Control.Feedback type="invalid">{errors.ingredients?.message}</Form.Control.Feedback>
                 </Form.Group>
 
                 {/* STEPS */}
-                <Form.Group className="mt-3">
+                <Form.Group className="mt-3" data-testid="recipe-steps-field">
                   <Form.Label>Steps</Form.Label>
                   <Form.Control as="textarea" rows={5} {...register("steps")} isInvalid={!!errors.steps} />
                   <Form.Control.Feedback type="invalid">{errors.steps?.message}</Form.Control.Feedback>
                 </Form.Group>
 
                 {/* TAGS */}
-                <Form.Group className="mt-3">
+                <Form.Group className="mt-3" data-testid="recipe-tags-field">
                   <Form.Label>Tags (comma separated)</Form.Label>
                   <Form.Control type="text" {...register("tags")} isInvalid={!!errors.tags} />
                   <Form.Control.Feedback type="invalid">{errors.tags?.message}</Form.Control.Feedback>
                 </Form.Group>
 
                 {/* DIETARY RESTRICTIONS */}
-                <Form.Group className="mt-3">
+                <Form.Group className="mt-3" data-testid="recipe-dietary-field">
                   <Form.Label>Dietary Restrictions</Form.Label>
                   {["vegan", "vegetarian", "gluten-free", "dairy-free", "nut-free"].map((d) => (
                     <Form.Check key={d} type="checkbox" value={d} label={d} {...register("dietaryRestrictions")} className="ms-2" />

@@ -4,6 +4,8 @@ const DEV_SERVER_PORT = Number(process.env.PLAYWRIGHT_DEV_PORT ?? 3100);
 const PLAYWRIGHT_BASE_URL =
   process.env.PLAYWRIGHT_TEST_BASE_URL ?? `http://127.0.0.1:${DEV_SERVER_PORT}`;
 
+process.env.NEXTAUTH_URL = PLAYWRIGHT_BASE_URL;
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -77,6 +79,10 @@ export default defineConfig({
   webServer: {
     command: `npm run dev -- --port ${DEV_SERVER_PORT}`,
     url: PLAYWRIGHT_BASE_URL,
+    env: {
+      ...process.env,
+      NEXTAUTH_URL: PLAYWRIGHT_BASE_URL,
+    },
     reuseExistingServer: !process.env.CI,
   },
 });
