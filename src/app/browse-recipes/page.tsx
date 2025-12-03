@@ -13,7 +13,7 @@ import {
 } from 'react-bootstrap';
 import { Search, StarFill } from 'react-bootstrap-icons';
 import RecipeCard from '@/components/RecipeCard';
-import { recipes, type Recipe } from '@/lib/recipeData';
+import { marketingRecipes as recipes, type Recipe } from '@/lib/recipeData';
 
 export default function RecipesPage() {
   /* ------------------------ SEARCH ------------------------ */
