@@ -8,7 +8,8 @@
     "build": "node scripts/clean-prisma-client.mjs && prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "playwright-development": "npx playwright test"
+    "playwright-development": "npx playwright test",
+    "postbuild": "npx prisma migrate deploy"  
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -38,10 +39,11 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.22",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^8",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^18.0.0",
-    "eslint-config-next": "14.2.10",
+    "eslint-config-next": "^16.0.6",
     "eslint-config-prettier": "^9.1.0",
     "postcss": "^8.5.6",
     "prettier": "^3.3.1",
