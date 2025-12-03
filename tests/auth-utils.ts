@@ -1,20 +1,46 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import/no-extraneous-dependencies */
-import { test as base, Page, request } from "@playwright/test";
-type StorageState = any;
-import fs from "fs";
-import path from "path";
-import { PLAYWRIGHT_BASE_URL } from "./test-helpers";
+import { test as base, Page, request } from '@playwright/test';
+import type { StorageState } from '@playwright/test';
+import fs from 'fs';
+import path from 'path';
+import { PrismaClient, Role } from '@prisma/client';
+import { hash } from 'bcrypt';
+import { PLAYWRIGHT_BASE_URL } from './test-helpers';
 
 const BASE_URL = PLAYWRIGHT_BASE_URL;
-const SESSION_STORAGE_PATH = path.join(__dirname, "playwright-auth-sessions");
+const SESSION_STORAGE_PATH = path.join(__dirname, 'playwright-auth-sessions');
 
 if (!fs.existsSync(SESSION_STORAGE_PATH)) {
   fs.mkdirSync(SESSION_STORAGE_PATH, { recursive: true });
 }
 
+const globalForPrisma = global as unknown as { __playwrightPrisma?: PrismaClient };
+const prisma =
+  globalForPrisma.__playwrightPrisma ??
+  new PrismaClient({
+    log: process.env.CI ? [] : ['error'],
+  });
+if (!globalForPrisma.__playwrightPrisma) {
+  globalForPrisma.__playwrightPrisma = prisma;
+}
+
 interface AuthFixtures {
   getUserPage: (email: string, password: string) => Promise<Page>;
+}
+
+async function ensureTestAccount(email: string, password: string): Promise<void> {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (user) {
+    return;
+  }
+  const hashedPassword = await hash(password, 10);
+  await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+      role: Role.USER,
+    },
+  });
 }
 
 async function hasValidSession(
@@ -113,6 +139,7 @@ async function ensureStorageState(
 export const test = base.extend<AuthFixtures>({
   getUserPage: async ({ browser }, use) => {
     const createUserPage = async (email: string, password: string) => {
+      await ensureTestAccount(email, password);
       const storageState = await ensureStorageState(
         email,
         password,
