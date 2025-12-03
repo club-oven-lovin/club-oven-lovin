@@ -23,8 +23,8 @@ const hasDietaryData = (recipe: RecipeCardRecipe): recipe is PrismaRecipe =>
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const primaryOrange = '#ff6b35';
 
-    const rating = hasMarketingFields(recipe) ? recipe.rating : 5;
-    const time = hasMarketingFields(recipe) ? recipe.time : 'N/A';
+  const rating = hasMarketingFields(recipe) ? recipe.rating ?? 5 : 5;
+  const time = hasMarketingFields(recipe) ? recipe.time ?? 'N/A' : 'N/A';
   const tags = hasDietaryData(recipe) ? recipe.tags : [];
   const dietaryRestrictions = hasDietaryData(recipe) ? recipe.dietaryRestrictions : [];
 
