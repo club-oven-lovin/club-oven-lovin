@@ -1,0 +1,48 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Club Oven Lovin' Club Oven Lovin'" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Club Oven Lovin'" [ref=e5]
+        - generic [ref=e6]: Club Oven Lovin'
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /user-home-page
+          - link "Recipes" [ref=e10] [cursor=pointer]:
+            - /url: /browse-recipes
+          - link "Vendors" [ref=e11] [cursor=pointer]:
+            - /url: /vendors
+        - generic [ref=e12]:
+          - link "Sign In" [ref=e13] [cursor=pointer]:
+            - /url: /auth/signin
+          - button "Sign Up" [ref=e14] [cursor=pointer]
+  - main [ref=e15]:
+    - main [ref=e16]:
+      - generic [ref=e19]:
+        - heading "Sign In" [level=1] [ref=e20]
+        - generic [ref=e21]:
+          - generic [ref=e23]:
+            - generic [ref=e24]:
+              - generic [ref=e25]: Email
+              - textbox "example@foo.com" [ref=e26]
+            - generic [ref=e27]:
+              - generic [ref=e28]: Password
+              - textbox [ref=e29]
+            - button "Sign In" [ref=e30] [cursor=pointer]
+          - generic [ref=e31]:
+            - text: Don't have an account?
+            - link "Sign up" [ref=e32] [cursor=pointer]:
+              - /url: /auth/signup
+  - contentinfo [ref=e33]:
+    - generic [ref=e36]:
+      - heading "Club Oven Lovin'" [level=5] [ref=e37]
+      - paragraph [ref=e38]:
+        - text: Department of Information and Computer Sciences
+        - text: University of Hawaii
+        - text: Honolulu, HI 96822
+  - alert [ref=e39]
+```

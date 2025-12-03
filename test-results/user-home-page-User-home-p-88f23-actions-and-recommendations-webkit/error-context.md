@@ -1,0 +1,67 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Club Oven Lovin' Club Oven Lovin'" [ref=e4]:
+        - /url: /
+        - img "Club Oven Lovin'" [ref=e5]
+        - generic [ref=e6]: Club Oven Lovin'
+      - button "Toggle navigation" [ref=e7]
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - link "Home" [ref=e10]:
+            - /url: /user-home-page
+          - link "Recipes" [ref=e11]:
+            - /url: /browse-recipes
+          - link "Vendors" [ref=e12]:
+            - /url: /vendors
+        - generic [ref=e13]:
+          - link "Sign In" [ref=e14]:
+            - /url: /auth/signin
+          - button "Sign Up" [ref=e15]
+  - main [ref=e16]:
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - paragraph [ref=e20]: Toaster Oven Recipes for Students
+        - heading "Healthy, Affordable Meals with Just a Toaster Oven" [level=1] [ref=e21]
+        - paragraph [ref=e22]: Discover delicious recipes designed for college students with limited kitchens, tight budgets, and busy schedules.
+        - list [ref=e23]:
+          - listitem [ref=e24]: Toaster oven-friendly recipes
+          - listitem [ref=e25]: Price breakdowns per serving
+          - listitem [ref=e26]: Ingredients available near UH campus
+          - listitem [ref=e27]: Plus filters (vegan, gluten-free, etc.)
+        - generic [ref=e28]:
+          - link "Sign In to Start Cooking" [ref=e29]:
+            - /url: /login
+          - link "Browse Recipes" [ref=e30]:
+            - /url: /recipes
+      - generic:
+        - generic:
+          - generic:
+            - img "Toaster oven sheet pan pizzas with toppings" [ref=e31]
+            - img "Simple roasted vegetables cooked in a toaster oven" [ref=e32]
+    - generic [ref=e33]:
+      - heading "Quick Stats" [level=2] [ref=e34]
+      - generic [ref=e35]:
+        - generic [ref=e38]:
+          - heading "140" [level=3] [ref=e39]
+          - paragraph [ref=e40]: Recipes
+        - generic [ref=e43]:
+          - heading "5.4M" [level=3] [ref=e44]
+          - paragraph [ref=e45]: Visits
+        - generic [ref=e48]:
+          - heading "21.8K" [level=3] [ref=e49]
+          - paragraph [ref=e50]: Average price
+        - generic [ref=e53]:
+          - heading "4.2 ★" [level=3] [ref=e54]
+          - paragraph [ref=e55]: Reviews
+  - contentinfo [ref=e56]:
+    - generic [ref=e59]:
+      - heading "Club Oven Lovin'" [level=5] [ref=e60]
+      - paragraph [ref=e61]:
+        - text: Department of Information and Computer Sciences
+        - text: University of Hawaii
+        - text: Honolulu, HI 96822
+```
