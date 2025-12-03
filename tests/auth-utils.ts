@@ -1,20 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import/no-extraneous-dependencies */
-import {
-  test as base,
-  Page,
-  request,
-  type StorageState,
-  expect,
-} from '@playwright/test';
-import fs from 'fs';
-import path from 'path';
-import { PLAYWRIGHT_BASE_URL } from './test-helpers';
+import { test as base, Page, request } from "@playwright/test";
+type StorageState = any;
+import fs from "fs";
+import path from "path";
+import { PLAYWRIGHT_BASE_URL } from "./test-helpers";
 
 const BASE_URL = PLAYWRIGHT_BASE_URL;
-const SESSION_STORAGE_PATH = path.join(
-  __dirname,
-  'playwright-auth-sessions'
-);
+const SESSION_STORAGE_PATH = path.join(__dirname, "playwright-auth-sessions");
 
 if (!fs.existsSync(SESSION_STORAGE_PATH)) {
   fs.mkdirSync(SESSION_STORAGE_PATH, { recursive: true });
@@ -26,7 +19,7 @@ interface AuthFixtures {
 
 async function hasValidSession(
   email: string,
-  storageState: StorageState
+  storageState: StorageState,
 ): Promise<boolean> {
   const requestContext = await request.newContext({
     baseURL: BASE_URL,
@@ -34,7 +27,7 @@ async function hasValidSession(
   });
 
   try {
-    const response = await requestContext.get('/api/auth/session');
+    const response = await requestContext.get("/api/auth/session");
     if (!response.ok()) {
       return false;
     }
@@ -49,38 +42,36 @@ async function hasValidSession(
 
 async function loginViaApi(
   email: string,
-  password: string
+  password: string,
 ): Promise<StorageState> {
   const requestContext = await request.newContext({
     baseURL: BASE_URL,
   });
 
   try {
-    const csrfResponse = await requestContext.get('/api/auth/csrf');
+    const csrfResponse = await requestContext.get("/api/auth/csrf");
     if (!csrfResponse.ok()) {
-      throw new Error(
-        `Failed to fetch CSRF token: ${csrfResponse.status()}`
-      );
+      throw new Error(`Failed to fetch CSRF token: ${csrfResponse.status()}`);
     }
     const { csrfToken } = await csrfResponse.json();
 
     const loginResponse = await requestContext.post(
-      '/api/auth/callback/credentials?json=true',
+      "/api/auth/callback/credentials?json=true",
       {
         form: {
           csrfToken,
           email,
           password,
           callbackUrl: `${BASE_URL}/user-home-page`,
-          json: 'true',
+          json: "true",
         },
-      }
+      },
     );
 
     if (!loginResponse.ok()) {
       const body = await loginResponse.text();
       throw new Error(
-        `Login failed with status ${loginResponse.status()}: ${body}`
+        `Login failed with status ${loginResponse.status()}: ${body}`,
       );
     }
 
@@ -93,25 +84,20 @@ async function loginViaApi(
 async function ensureStorageState(
   email: string,
   password: string,
-  sessionName: string
+  sessionName: string,
 ): Promise<StorageState> {
-  const sessionPath = path.join(
-    SESSION_STORAGE_PATH,
-    `${sessionName}.json`
-  );
+  const sessionPath = path.join(SESSION_STORAGE_PATH, `${sessionName}.json`);
 
   if (fs.existsSync(sessionPath)) {
     try {
       const savedState: StorageState = JSON.parse(
-        fs.readFileSync(sessionPath, 'utf8')
+        fs.readFileSync(sessionPath, "utf8"),
       );
       if (await hasValidSession(email, savedState)) {
         console.log(`✓ Restored session for ${email}`);
         return savedState;
       }
-      console.log(
-        `× Saved session for ${email} expired, re-authenticating...`
-      );
+      console.log(`× Saved session for ${email} expired, re-authenticating...`);
     } catch (error) {
       console.log(`× Error restoring session for ${email}: ${error}`);
     }
@@ -130,7 +116,7 @@ export const test = base.extend<AuthFixtures>({
       const storageState = await ensureStorageState(
         email,
         password,
-        `session-${email}`
+        `session-${email}`,
       );
       const context = await browser.newContext({ storageState });
       const page = await context.newPage();
@@ -141,4 +127,4 @@ export const test = base.extend<AuthFixtures>({
   },
 });
 
-export { expect } from '@playwright/test';
+export { expect } from "@playwright/test";
