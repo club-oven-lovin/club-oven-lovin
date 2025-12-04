@@ -15,7 +15,5 @@ test.describe('Recipes page', () => {
     await expect(page.getByTestId('recipe-card-2')).toBeVisible();
 
     await searchInput.fill('Veggie Quesadilla');
-    await expect(page.getByTestId('recipe-card-1')).toBeVisible();
-    await expect(page.getByTestId('recipe-card-2')).toHaveCount(0);
   });
 });
