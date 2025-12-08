@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Table, Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
 import { CheckCircleFill, XCircleFill, PencilSquare, PlusCircle } from 'react-bootstrap-icons';
-
+import { updateIngredient } from '@/lib/dbActions';
 import type { Ingredient, Vendor as VendorType } from '@prisma/client';
 
 export default function Vendor({
@@ -14,6 +14,59 @@ export default function Vendor({
   ingredients: Ingredient[];
 }) {
   const [ingredients, setIngredients] = useState(initialIngredients);
+
+  // Track the row being edited
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [editForm, setEditForm] = useState({
+    id: '',
+    name: '',
+    price: '',
+    size: '',
+    available: true,
+  });
+
+  const startEditing = (ingredient: Ingredient) => {
+    setEditingId(ingredient.id);
+    setEditForm({
+      id: ingredient.id,
+      name: ingredient.name,
+      price: ingredient.price.toString(),
+      size: ingredient.size,
+      available: ingredient.available,
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+  };
+
+  const saveChanges = async () => {
+    await updateIngredient({
+      id: editForm.id,
+      name: editForm.name,
+      price: parseFloat(editForm.price),
+      size: editForm.size,
+      available: editForm.available,
+    });
+
+    // update UI instantly
+    setIngredients((prev) =>
+      prev.map((i) =>
+        i.id === editForm.id
+          ? {
+              ...i,
+              name: editForm.name,
+              price: parseFloat(editForm.price),
+              size: editForm.size,
+              available: editForm.available,
+            }
+          : i
+      )
+    );
+
+    setEditingId(null);
+  };
 
   const [newIngredient, setNewIngredient] = useState({
     name: '',
@@ -54,9 +107,7 @@ export default function Vendor({
         data-testid="vendor-greeting-card"
       >
         <Card.Body className="text-center">
-          <Card.Title className="fs-2">
-            Welcome, {vendor?.name || 'Vendor'}
-          </Card.Title>
+          <Card.Title className="fs-2">Welcome, {vendor?.name || 'Vendor'}</Card.Title>
           <Card.Text>
             Location: <strong>{vendor?.address || 'N/A'}</strong><br />
             Hours: {vendor?.hours || 'N/A'}
@@ -82,26 +133,81 @@ export default function Vendor({
           </tr>
         </thead>
         <tbody>
-          {ingredients.map((item) => (
-            <tr key={item.id}>
-              <td>{item.name}</td>
-              <td>${item.price.toFixed(2)}</td>
-              <td>{item.size}</td>
-              <td className="text-center">
-                {item.available ? (
-                  <CheckCircleFill className="text-success" />
-                ) : (
-                  <XCircleFill className="text-danger" />
-                )}
-              </td>
-              <td className="text-center">
-                <Button className="vendor-homepage-orange-btn"
-                 size="sm">
-                  <PencilSquare />
-                </Button>
-              </td>
-            </tr>
-          ))}
+          {ingredients.map((item) =>
+            editingId === item.id ? (
+              // Editable Row
+              <tr key={item.id}>
+                <td>
+                  <Form.Control
+                    value={editForm.name}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, name: e.target.value })
+                    }
+                  />
+                </td>
+
+                <td>
+                  <Form.Control
+                    value={editForm.price}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, price: e.target.value })
+                    }
+                  />
+                </td>
+
+                <td>
+                  <Form.Control
+                    value={editForm.size}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, size: e.target.value })
+                    }
+                  />
+                </td>
+
+                <td className="text-center">
+                  <Form.Check
+                    type="checkbox"
+                    checked={editForm.available}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, available: e.target.checked })
+                    }
+                  />
+                </td>
+
+                <td>
+                  <Button size="sm" variant="success" onClick={saveChanges}>
+                    Save
+                  </Button>{' '}
+                  <Button size="sm" variant="secondary" onClick={cancelEditing}>
+                    Cancel
+                  </Button>
+                </td>
+              </tr>
+            ) : (
+              // Normal display row
+              <tr key={item.id}>
+                <td>{item.name}</td>
+                <td>${item.price.toFixed(2)}</td>
+                <td>{item.size}</td>
+                <td className="text-center">
+                  {item.available ? (
+                    <CheckCircleFill className="text-success" />
+                  ) : (
+                    <XCircleFill className="text-danger" />
+                  )}
+                </td>
+                <td className="text-center">
+                  <Button
+                    className="vendor-homepage-orange-btn"
+                    size="sm"
+                    onClick={() => startEditing(item)}
+                  >
+                    <PencilSquare />
+                  </Button>
+                </td>
+              </tr>
+            )
+          )}
         </tbody>
       </Table>
 
@@ -119,6 +225,7 @@ export default function Vendor({
                 }
               />
             </Col>
+
             <Col md>
               <Form.Control
                 placeholder="Price"
@@ -128,6 +235,7 @@ export default function Vendor({
                 }
               />
             </Col>
+
             <Col md>
               <Form.Control
                 placeholder="Size"
@@ -137,6 +245,7 @@ export default function Vendor({
                 }
               />
             </Col>
+
             <Col md>
               <Form.Select
                 value={newIngredient.available ? 'true' : 'false'}
@@ -151,6 +260,7 @@ export default function Vendor({
                 <option value="false">Not Available</option>
               </Form.Select>
             </Col>
+
             <Col md="auto">
               <Button className="vendor-homepage-orange-btn" onClick={handleAddIngredient}>
                 <PlusCircle /> Add

@@ -78,6 +78,27 @@ export async function editStuff(stuff: Stuff) {
 }
 
 /**
+ * Edits ingredients on vendor page.
+ */
+export async function updateIngredient(data: {
+  id: string;
+  name: string;
+  price: number;
+  size: string;
+  available: boolean;
+}) {
+  await prisma.ingredient.update({
+    where: { id: data.id },
+    data: {
+      name: data.name,
+      price: data.price,
+      size: data.size,
+      available: data.available,
+    },
+  });
+}
+
+/**
  * Edits user profile in the database.
  */
 export async function updateUserProfile(data: {
