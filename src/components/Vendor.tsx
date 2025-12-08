@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Table, Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
 import { CheckCircleFill, XCircleFill, PencilSquare, PlusCircle } from 'react-bootstrap-icons';
-import { updateIngredient } from '@/lib/dbActions';
+import { addIngredient, updateIngredient } from '@/lib/dbActions';
 import type { Ingredient, Vendor as VendorType } from '@prisma/client';
 
 export default function Vendor({
@@ -75,21 +75,24 @@ export default function Vendor({
     available: true,
   });
 
-  const handleAddIngredient = () => {
+  const handleAddIngredient = async () => {
     if (!newIngredient.name || !newIngredient.price) return;
+    if (!vendor) return;
 
-    const ingredientToAdd = {
-      id: crypto.randomUUID(),
-      owner: vendor?.owner ?? '',
-      vendorId: vendor?.id ?? null,
+    // 1. Save to the database
+    const created = await addIngredient({
+      owner: vendor.owner,
+      vendorId: vendor.id,
       name: newIngredient.name,
       price: parseFloat(newIngredient.price),
       size: newIngredient.size,
       available: newIngredient.available,
-    };
+    });
 
-    setIngredients([...ingredients, ingredientToAdd]);
+    // 2. Update UI using the returned DB item
+    setIngredients([...ingredients, created]);
 
+    // 3. Reset input fields
     setNewIngredient({
       name: '',
       price: '',

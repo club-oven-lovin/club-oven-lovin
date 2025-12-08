@@ -32,6 +32,22 @@ export async function addStuff(stuff: { name: string; quantity: number; owner: s
 }
 
 /**
+ * Add ingredient to vendor list.
+ */
+export async function addIngredient(data: {
+  owner: string;
+  vendorId: string;
+  name: string;
+  price: number;
+  size: string;
+  available: boolean;
+}) {
+  return prisma.ingredient.create({
+    data,
+  });
+}
+
+/**
  * Creates a new recipe.
  */
 export async function addRecipe(recipe: {
