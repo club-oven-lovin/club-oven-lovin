@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { Recipe } from '@/lib/recipeData';
 import RecipeListClient from '@/components/RecipeListClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function RecipesPage() {
   // Fetch all recipes from the database
   const recipes: Recipe[] = await prisma.recipe.findMany({
