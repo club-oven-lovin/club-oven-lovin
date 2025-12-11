@@ -11,7 +11,7 @@ import {
 } from 'react-bootstrap';
 import { Search } from 'react-bootstrap-icons';
 import RecipeCard from '@/components/RecipeCard';
-import { Recipe } from '@/lib/recipeData';
+import type { Recipe } from '@prisma/client';
 
 interface RecipeListClientProps {
   initialRecipes: Recipe[];
@@ -20,13 +20,27 @@ interface RecipeListClientProps {
 export default function RecipeListClient({ initialRecipes }: RecipeListClientProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredRecipes = initialRecipes.filter((recipe) =>
-    recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    recipe.ingredients.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    recipe.tags.some((tag) =>
-      tag.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  const normalizedSearch = searchTerm.toLowerCase().trim();
+
+  const filteredRecipes = initialRecipes.filter((recipe) => {
+    if (!normalizedSearch) return true;
+
+    const nameMatch = recipe.name.toLowerCase().includes(normalizedSearch);
+    const ingredientsMatch = (recipe.ingredients ?? '')
+      .toLowerCase()
+      .includes(normalizedSearch);
+
+    const tagsMatch = (recipe.tags ?? []).some((tag) =>
+      tag.toLowerCase().includes(normalizedSearch)
+    );
+
+    // 🔎 NEW: allow searching by dietary restrictions
+    const dietaryMatch = (recipe.dietaryRestrictions ?? []).some((restriction) =>
+      restriction.toLowerCase().includes(normalizedSearch)
+    );
+
+    return nameMatch || ingredientsMatch || tagsMatch || dietaryMatch;
+  });
 
   return (
     <Container className="py-4">
@@ -40,8 +54,12 @@ export default function RecipeListClient({ initialRecipes }: RecipeListClientPro
           <InputGroup.Text>
             <Search />
           </InputGroup.Text>
+
+          {/* 🔎 Accessible name for Playwright: "Search recipes" */}
           <Form.Control
-            placeholder="Search by name, ingredient, or tag..."
+            id="recipe-search"
+            aria-label="Search recipes"
+            placeholder="Search recipes by name, ingredient, tag, or dietary restriction..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -53,7 +71,11 @@ export default function RecipeListClient({ initialRecipes }: RecipeListClientPro
       ) : (
         <Row xs={1} sm={2} md={3} lg={4} className="g-4">
           {filteredRecipes.map((recipe) => (
-            <Col key={recipe.id}>
+            <Col
+              key={recipe.id}
+              // 🧪 for tests/recipes-page.spec.ts
+              data-testid={`recipe-card-${recipe.id}`}
+            >
               <RecipeCard recipe={recipe} />
             </Col>
           ))}
