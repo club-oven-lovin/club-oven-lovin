@@ -1,7 +1,10 @@
 {
   "defaultAccounts": [
     { "email": "admin@foo.com", "password": "changeme", "role": "ADMIN" },
-    { "email": "john@foo.com", "password": "changeme" }
+    { "email": "john@foo.com", "password": "changeme" },
+    { "email": "manoa-market@vendors.com", "password": "changeme", "role": "VENDOR" },
+    { "email": "uh-produce@vendors.com", "password": "changeme", "role": "VENDOR" },
+    { "email": "island-ingredients@vendors.com", "password": "changeme", "role": "VENDOR" }
   ],
 
   "defaultData": [
@@ -17,6 +20,24 @@
       "name": "John’s Fresh Market",
       "address": "123 College Ave",
       "hours": "8am - 6pm"
+    },
+    {
+      "owner": "manoa-market@vendors.com",
+      "name": "Manoa Market Co-op",
+      "address": "2752 Woodlawn Dr, Honolulu, HI 96822",
+      "hours": "7am - 7pm"
+    },
+    {
+      "owner": "uh-produce@vendors.com",
+      "name": "University Avenue Produce",
+      "address": "2643 S King St, Honolulu, HI 96826",
+      "hours": "6am - 8pm"
+    },
+    {
+      "owner": "island-ingredients@vendors.com",
+      "name": "Island Ingredients Depot",
+      "address": "1010 University Ave, Honolulu, HI 96826",
+      "hours": "9am - 6pm"
     }
   ],
 
@@ -35,6 +56,70 @@
       "name": "Eggs",
       "price": 3.49,
       "size": "12-pack",
+      "available": true
+    },
+    {
+      "owner": "manoa-market@vendors.com",
+      "vendorName": "Manoa Market Co-op",
+      "name": "Milk",
+      "price": 5.25,
+      "size": "1 gallon",
+      "available": true
+    },
+    {
+      "owner": "uh-produce@vendors.com",
+      "vendorName": "University Avenue Produce",
+      "name": "Milk",
+      "price": 4.75,
+      "size": "1 gallon",
+      "available": true
+    },
+    {
+      "owner": "manoa-market@vendors.com",
+      "vendorName": "Manoa Market Co-op",
+      "name": "Eggs",
+      "price": 3.99,
+      "size": "12-pack",
+      "available": true
+    },
+    {
+      "owner": "uh-produce@vendors.com",
+      "vendorName": "University Avenue Produce",
+      "name": "Eggs",
+      "price": 3.59,
+      "size": "18-pack",
+      "available": true
+    },
+    {
+      "owner": "island-ingredients@vendors.com",
+      "vendorName": "Island Ingredients Depot",
+      "name": "Local Honey",
+      "price": 7.5,
+      "size": "16 oz jar",
+      "available": true
+    },
+    {
+      "owner": "manoa-market@vendors.com",
+      "vendorName": "Manoa Market Co-op",
+      "name": "Taro Leaves",
+      "price": 2.5,
+      "size": "1 bunch",
+      "available": true
+    },
+    {
+      "owner": "uh-produce@vendors.com",
+      "vendorName": "University Avenue Produce",
+      "name": "Fresh Basil",
+      "price": 1.75,
+      "size": "1 bunch",
+      "available": true
+    },
+    {
+      "owner": "island-ingredients@vendors.com",
+      "vendorName": "Island Ingredients Depot",
+      "name": "Poi Flour",
+      "price": 9.99,
+      "size": "2 lb bag",
       "available": true
     }
   ]
