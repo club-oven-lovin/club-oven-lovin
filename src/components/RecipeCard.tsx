@@ -1,8 +1,8 @@
-// src/components/RecipeCard.tsx
 
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Card, Badge } from 'react-bootstrap';
 import { StarFill } from 'react-bootstrap-icons';
 import type { Recipe as MarketingRecipe } from '@/lib/recipeData';
@@ -14,8 +14,10 @@ interface RecipeCardProps {
   recipe: RecipeCardRecipe;
 }
 
-const hasMarketingFields = (recipe: RecipeCardRecipe): recipe is MarketingRecipe =>
-  'rating' in recipe && 'time' in recipe && 'price' in recipe;
+const hasMarketingFields = (
+  recipe: RecipeCardRecipe
+): recipe is MarketingRecipe =>
+  'rating' in recipe && 'time' in recipe;
 
 const hasDietaryData = (recipe: RecipeCardRecipe): recipe is PrismaRecipe =>
   'tags' in recipe && 'dietaryRestrictions' in recipe;
@@ -26,68 +28,76 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const rating = hasMarketingFields(recipe) ? recipe.rating ?? 5 : 5;
   const time = hasMarketingFields(recipe) ? recipe.time ?? 'N/A' : 'N/A';
   const tags = hasDietaryData(recipe) ? recipe.tags : [];
-  const dietaryRestrictions = hasDietaryData(recipe) ? recipe.dietaryRestrictions : [];
+  const dietaryRestrictions = hasDietaryData(recipe)
+    ? recipe.dietaryRestrictions
+    : [];
+
+  const href = `/recipes/${recipe.id}`;
 
   return (
-    <Card
-      className="h-100 shadow-sm border-0 recipe-card-custom"
-      data-testid={`recipe-card-${recipe.id}`}
-    >
-      <div className="recipe-card-image-container">
-        <Image
-          src={recipe.image || '/images/placeholder.png'}
-          alt={recipe.name || 'Recipe'}
-          width={150}
-          height={150}
-          className="card-img-top recipe-card-image"
-          style={{ objectFit: 'cover' }}
-        />
-      </div>
+    <Link href={href} className="text-decoration-none text-reset">
+      <Card className="h-100 shadow-sm border-0">
+        {recipe.image && (
+          <div className="position-relative" style={{ height: 200 }}>
+            <Image
+              src={recipe.image}
+              alt={recipe.name}
+              fill
+              className="object-fit-cover rounded-top"
+            />
+          </div>
+        )}
 
-      <Card.Body className="d-flex flex-column">
-        <Card.Title className="fw-bold fs-6 mb-1" style={{ color: '#343a40' }}>
-          {recipe.name}
-        </Card.Title>
+        <Card.Body>
+          <Card.Title className="d-flex justify-content-between align-items-start">
+            <span>{recipe.name}</span>
+            <span className="d-flex align-items-center gap-1">
+              {Array.from({ length: rating }).map((_, i) => (
+                <StarFill key={i} size={14} color={primaryOrange} />
+              ))}
+            </span>
+          </Card.Title>
 
-        {/* Rating / Time */}
-        <div className="d-flex align-items-center mb-2">
-          {Array.from({ length: rating }).map((_, i) => (
-            <StarFill key={i} size={14} className="me-1" style={{ color: primaryOrange }} />
-          ))}
-          <span className="text-muted ms-auto" style={{ fontSize: '0.9em' }}>
-            {time}
-          </span>
-        </div>
+          {time !== 'N/A' && (
+            <Card.Subtitle className="mb-2 text-muted">
+              {time}
+            </Card.Subtitle>
+          )}
 
-        {/* Tags */}
-        <div className="mb-1">
-          {tags.map((tag) => (
-            <Badge key={tag} bg="warning" className="me-1 text-dark">
-              {tag}
-            </Badge>
-          ))}
-        </div>
+          {tags.length > 0 && (
+            <div className="mb-2 d-flex flex-wrap gap-1">
+              {tags.map((tag) => (
+                <Badge key={tag} bg="light" text="dark">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
 
-        {/* Dietary Restrictions */}
-        <div className="mb-2">
-          {dietaryRestrictions.map((d) => (
-            <Badge key={d} bg="success" className="me-1">
-              {d}
-            </Badge>
-          ))}
-        </div>
+          {dietaryRestrictions.length > 0 && (
+            <div className="d-flex flex-wrap gap-1">
+              {dietaryRestrictions.map((d) => (
+                <Badge
+                  key={d}
+                  bg="light"
+                  text="dark"
+                  style={{
+                    border: `1px solid ${primaryOrange}`,
+                    color: primaryOrange,
+                  }}
+                >
+                  {d}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </Card.Body>
 
-        {/* Removed Price display entirely */}
-        {/* <Card.Text className="mt-auto fw-bold" style={{ color: primaryOrange }}>
-          {price}
-        </Card.Text> */}
-
-        {/* Display owner, useful for debugging or user-specific views */}
-        <Card.Text className="text-muted mt-auto" style={{ fontSize: '0.8em' }}>
+        <Card.Footer className="bg-white border-0 small text-muted">
           By: {recipe.owner}
-        </Card.Text>
-      </Card.Body>
-    </Card>
+        </Card.Footer>
+      </Card>
+    </Link>
   );
 };
 
