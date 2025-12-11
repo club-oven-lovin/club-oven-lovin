@@ -1,81 +1,92 @@
+
 import { prisma } from '@/lib/prisma';
-import { Container, Row, Col, Card } from 'react-bootstrap';
 
-/**
- * This component:
- * - Records a page visit to "/"
- * - Fetches counts for recipes, visits, and user profiles
- * - Renders the Quick Stats cards with dynamic values
- */
-const QuickStats = async () => {
-  const creamColor = '#fff8f1';
-  const orangeColor = '#ff6b35';
+type StatCardProps = {
+  label: string;
+  value: string | number;
+  testId: string;
+};
 
-  // 1) Record this page visit
-  await prisma.pageVisit.create({
-    data: {
-      path: '/', // landing page
-    },
-  });
+const orangeColor = '#ff6b35';
+const creamColor = '#fff8f1';
 
-  // 2) Fetch counts for stats
-  const [recipesCount, visitsCount, userProfilesCount] = await prisma.$transaction([
-    prisma.recipe.count(),
-    prisma.pageVisit.count(),
-    prisma.user.count(),
-  ]);
+function StatCard({ label, value, testId }: StatCardProps) {
+  return (
+    <div
+      data-testid={testId}
+      className="rounded-xl bg-white shadow-sm px-6 py-5 flex flex-col items-center justify-center"
+    >
+      <div
+        className="text-3xl md:text-4xl font-extrabold"
+        style={{ color: orangeColor }}
+      >
+        {value}
+      </div>
+      <div className="mt-1 text-sm text-slate-600">{label}</div>
+    </div>
+  );
+}
 
-  const stats = [
-    {
-      label: 'Recipes',
-      value: recipesCount.toString(),
-      testId: 'stat-recipes',
-    },
-    {
-      label: 'Visits',
-      value: visitsCount.toString(),
-      testId: 'stat-visits',
-    },
-    {
-      // Keeping the same testId so existing tests don’t break
-      label: 'User Profiles',
-      value: userProfilesCount.toString(),
-      testId: 'stat-average-price',
-    },
-    {
-      // Leave reviews static for now (you said you’ll handle it later)
-      label: 'Reviews',
-      value: '4.2 ★',
-      testId: 'stat-reviews',
-    },
-  ];
+// NOTE: no "use client" here — this stays a SERVER component.
+export default async function QuickStats() {
+  // 1) Log a page visit (but never crash the build if this fails)
+  try {
+    await prisma.pageVisit.create({
+      data: {
+        path: '/',
+      },
+    });
+  } catch (err) {
+    console.error('Error logging page visit in QuickStats', err);
+  }
+
+  // 2) Fetch counts (again, don’t let errors kill the build)
+  let recipeCount = 0;
+  let visitCount = 0;
+  let userCount = 0;
+
+  try {
+    recipeCount = await prisma.recipe.count();
+    visitCount = await prisma.pageVisit.count();
+    userCount = await prisma.user.count();
+  } catch (err) {
+    console.error('Error fetching quick stats', err);
+  }
 
   return (
-    <Container
-      fluid
-      className="py-5"
+    <section
+      className="w-full py-10 px-6 md:px-10"
       style={{ backgroundColor: creamColor }}
       data-testid="quick-stats-section"
     >
-      <h2 className="text-center mb-5 fw-bold" style={{ color: orangeColor }}>
-        Quick Stats
-      </h2>
-      <Row className="text-center">
-        {stats.map((stat) => (
-          <Col key={stat.testId} md={3} sm={6} className="mb-4">
-            <Card className="border-0 shadow-sm h-100" data-testid={stat.testId}>
-              <Card.Body>
-                <h3 className="display-5 fw-bold" style={{ color: orangeColor }}>
-                  {stat.value}
-                </h3>
-                <p className="text-muted">{stat.label}</p>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-    </Container>
-  );
-};
+      <div className="mx-auto max-w-6xl">
+        <h2 className="text-center mb-6 text-2xl md:text-3xl font-bold text-orange-500">
+          Quick Stats
+        </h2>
 
-export default QuickStats;
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
+          <StatCard
+            label="Recipes"
+            value={recipeCount}
+            testId="stat-recipes"
+          />
+          <StatCard
+            label="Visits"
+            value={visitCount}
+            testId="stat-visits"
+          />
+          <StatCard
+            label="User Profiles"
+            value={userCount}
+            testId="stat-users"
+          />
+          <StatCard
+            label="Reviews"
+            value="4.2 ★"
+            testId="stat-reviews"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
