@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { HeroImageSlider } from "./HeroImageSlider";
 
@@ -16,10 +17,9 @@ type HeroSectionProps = {
   className?: string;
 };
 
-export function HeroSection({ className }: 
-HeroSectionProps) {
-  const creamColor = '#fff8f1'
-  
+export function HeroSection({ className }: HeroSectionProps) {
+  const creamColor = "#fff8f1";
+
   return (
     <section
       className={`w-full py-16 px-6 md:px-10 ${className ?? ""}`}
@@ -52,13 +52,13 @@ HeroSectionProps) {
           </ul>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
-              href="/login"
+              href="/auth/signin"
               className="inline-flex items-center justify-center rounded-full bg-orange-500 px-6 py-3 text-base font-semibold text-white shadow-lg transition hover:bg-orange-600"
             >
               Sign In to Start Cooking
             </Link>
             <Link
-              href="/recipes"
+              href="/browse-recipes"
               className="inline-flex items-center justify-center rounded-full border border-slate-300 px-6 py-3 text-base font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-white"
             >
               Browse Recipes
