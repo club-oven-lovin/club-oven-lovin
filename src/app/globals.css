@@ -65,55 +65,6 @@ body {
   border-color: #ea580c !important;
 }
 
-
-/* User Profile Specific Styles */
-.userprofile-card-accent {
-  background-color: #d6f5f0 !important;
-  color: #333 !important;
-}
-
-.userprofile-primary-accent {
-  background-color: #f97316 !important;
-  color: white !important;
-  border-color: #f97316 !important;
-}
-
-.userprofile-primary-accent:hover {
-  background-color: #ea580c !important; /* darker orange */
-  border-color: #ea580c !important;
-  color: white !important;
-}
-
-.userprofile-avatar {
-  background-color: #f97316 !important;
-  color: white !important;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.userprofile-badge {
-  background-color: #f97316 !important;
-  color: white !important;
-  font-size: 0.85rem;
-}
-
-.userprofile-section-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.userprofile-card-title {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.userprofile-card {
-  border-radius: 1rem;
-  overflow: hidden;
-}
-
 /* AddRecipeForm */
 .add-recipe-submit-btn {
   background-color: #f97316 !important;
@@ -258,4 +209,92 @@ body {
     padding: 10px 20px;
     font-size: 1rem;
   }
+}
+
+/* ---------------- */
+/*   USER PROFILE   */
+/* ---------------- */
+
+/* title */
+.userprofile-title {
+  font-size: 2.4rem;
+  color: #0b5e57;
+  font-weight: 700;
+}
+
+/* Name + Email */
+.userprofile-name-text {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0b5e57;
+}
+
+.userprofile-email-text {
+  font-size: 1.1rem;
+  color: #495057;
+}
+
+/* Avatar */
+.userprofile-avatar {
+  background-color: #d6f5f0 !important;
+  color: #0b5e57 !important;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.3rem;
+}
+
+/* Badge styles */
+.userprofile-tag-badge {
+  background-color: #ffd4bb !important; /* light orange */
+  color: #8a3a00 !important;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 12px;
+}
+
+.userprofile-diet-badge {
+  background-color: #d6f5f0 !important; /* mint */
+  color: #0b5e57 !important;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 12px;
+}
+
+/* Section titles (“Contributed Recipes”, etc.) */
+.userprofile-section-title {
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  color: #1f1f1f !important;
+  margin-top: 1rem;
+}
+
+/* Edit buttons */
+.userprofile-edit-btn {
+  background-color: var(--primary-orange) !important;
+  border-color: var(--primary-orange) !important;
+  color: white !important;
+}
+
+.userprofile-edit-btn:hover {
+  background-color: #ea580c !important;
+  border-color: #ea580c !important;
+}
+
+/* Recipe cards inside user profile */
+.userprofile-card {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.userprofile-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Image area at top of recipe cards */
+.userprofile-card-accent {
+  color: #333 !important;
 }
