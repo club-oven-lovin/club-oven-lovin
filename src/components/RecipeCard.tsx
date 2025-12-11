@@ -31,7 +31,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
   return (
     <Card
-      as={Link}
+       as={Link}
       href={`/recipes/${recipe.id}`}
       className="h-100 shadow-sm border-0 recipe-card-custom text-decoration-none"
       data-testid={`recipe-card-${recipe.id}`}
@@ -79,6 +79,11 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             </Badge>
           ))}
         </div>
+
+        {/* Removed Price display entirely */}
+        {/* <Card.Text className="mt-auto fw-bold" style={{ color: primaryOrange }}>
+          {price}
+        </Card.Text> */}
 
         {/* Display owner, useful for debugging or user-specific views */}
         <Card.Text className="text-muted mt-auto" style={{ fontSize: '0.8em' }}>
