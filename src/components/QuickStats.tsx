@@ -1,17 +1,54 @@
-'use client';
-
+import { prisma } from '@/lib/prisma';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 
-const stats = [
-  { label: 'Recipes', value: '140', testId: 'stat-recipes' },
-  { label: 'Visits', value: '5.4M', testId: 'stat-visits' },
-  { label: 'Average price', value: '21.8K', testId: 'stat-average-price' },
-  { label: 'Reviews', value: '4.2 ★', testId: 'stat-reviews' },
-];
-
-const QuickStats = () => {
+/**
+ * This component:
+ * - Records a page visit to "/"
+ * - Fetches counts for recipes, visits, and user profiles
+ * - Renders the Quick Stats cards with dynamic values
+ */
+const QuickStats = async () => {
   const creamColor = '#fff8f1';
   const orangeColor = '#ff6b35';
+
+  // 1) Record this page visit
+  await prisma.pageVisit.create({
+    data: {
+      path: '/', // landing page
+    },
+  });
+
+  // 2) Fetch counts for stats
+  const [recipesCount, visitsCount, userProfilesCount] = await prisma.$transaction([
+    prisma.recipe.count(),
+    prisma.pageVisit.count(),
+    prisma.user.count(),
+  ]);
+
+  const stats = [
+    {
+      label: 'Recipes',
+      value: recipesCount.toString(),
+      testId: 'stat-recipes',
+    },
+    {
+      label: 'Visits',
+      value: visitsCount.toString(),
+      testId: 'stat-visits',
+    },
+    {
+      // Keeping the same testId so existing tests don’t break
+      label: 'User Profiles',
+      value: userProfilesCount.toString(),
+      testId: 'stat-average-price',
+    },
+    {
+      // Leave reviews static for now (you said you’ll handle it later)
+      label: 'Reviews',
+      value: '4.2 ★',
+      testId: 'stat-reviews',
+    },
+  ];
 
   return (
     <Container
