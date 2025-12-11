@@ -1,9 +1,46 @@
 'use server';
 
-import { Stuff, Condition } from '@prisma/client';
+import { Stuff, Condition, Role } from '@prisma/client';
 import { hash } from 'bcrypt';
 import { redirect } from 'next/navigation';
 import { prisma } from './prisma';
+
+/**
+ * Updates a user's role (Admin only).
+ * @param userId - The ID of the user to update
+ * @param role - The new role (USER, VENDOR, or ADMIN)
+ */
+export async function updateUserRole(userId: number, role: Role) {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { role },
+  });
+}
+
+/**
+ * Deletes a user from the database (Admin only).
+ * @param userId - The ID of the user to delete
+ */
+export async function deleteUser(userId: number) {
+  await prisma.user.delete({
+    where: { id: userId },
+  });
+}
+
+/**
+ * Deletes a vendor from the database (Admin only).
+ * @param vendorId - The ID of the vendor to delete
+ */
+export async function deleteVendor(vendorId: string) {
+  // First delete all ingredients associated with this vendor
+  await prisma.ingredient.deleteMany({
+    where: { vendorId },
+  });
+  // Then delete the vendor
+  await prisma.vendor.delete({
+    where: { id: vendorId },
+  });
+}
 
 /**
  * Adds a new stuff to the database.

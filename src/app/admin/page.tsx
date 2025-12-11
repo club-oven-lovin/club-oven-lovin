@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { getServerSession } from 'next-auth';
-import { BarChartFill, EnvelopeFill, PatchCheckFill, PeopleFill } from 'react-bootstrap-icons';
+import { BarChartFill, BookFill, EnvelopeFill, PatchCheckFill, PeopleFill } from 'react-bootstrap-icons';
 import AdminDashboardLayout from '@/components/admin/AdminDashboardLayout';
 import QuickActionButton from '@/components/admin/QuickActionButton';
 import RecentReportItem from '@/components/admin/RecentReportItem';
@@ -15,6 +15,7 @@ type QuickAction = {
   title: string;
   detail: string;
   icon: ReactNode;
+  href?: string;
 };
 
 const statCards = [
@@ -31,14 +32,22 @@ const quickActionItems: QuickAction[] = [
     icon: <EnvelopeFill size={20} />,
   },
   {
-    title: 'Approve New Vendors',
-    detail: '2 pending submissions',
+    title: 'Manage Vendors',
+    detail: 'View & manage vendor profiles',
     icon: <PatchCheckFill size={20} />,
+    href: '/admin/vendors',
   },
   {
     title: 'Manage User Roles',
     detail: 'Update permissions & roles',
     icon: <PeopleFill size={20} />,
+    href: '/admin/users',
+  },
+  {
+    title: 'Manage Recipes',
+    detail: 'Edit or remove recipes',
+    icon: <BookFill size={20} />,
+    href: '/admin/recipes',
   },
   {
     title: 'View Site Analytics',
