@@ -42,7 +42,7 @@ export default function EditRecipeForm({ recipe }: EditRecipeFormProps) {
           dietaryRestrictions: dietaryRestrictions
             ? dietaryRestrictions.split(',').map((d) => d.trim())
             : [],
-          owner: recipe.owner,
+          // owner: recipe.owner,
         }),
       });
 

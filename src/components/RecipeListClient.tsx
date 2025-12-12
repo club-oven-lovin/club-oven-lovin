@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -22,24 +21,28 @@ export default function RecipeListClient({ initialRecipes }: RecipeListClientPro
 
   const normalizedSearch = searchTerm.toLowerCase().trim();
 
+  const searchWords = normalizedSearch
+    ? normalizedSearch
+        .split(/\s+/)
+        .map((w) => w.trim())
+        .filter((w) => w.length > 2)
+    : [];
+
   const filteredRecipes = initialRecipes.filter((recipe) => {
-    if (!normalizedSearch) return true;
+    if (!normalizedSearch || searchWords.length === 0) return true;
 
-    const nameMatch = recipe.name.toLowerCase().includes(normalizedSearch);
-    const ingredientsMatch = (recipe.ingredients ?? '')
-      .toLowerCase()
-      .includes(normalizedSearch);
+    const haystack = [
+      recipe.name,
+      recipe.ingredients ?? '',
+      ...(recipe.tags ?? []),
+      ...(recipe.dietaryRestrictions ?? []),
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
 
-    const tagsMatch = (recipe.tags ?? []).some((tag) =>
-      tag.toLowerCase().includes(normalizedSearch)
-    );
-
-    // 🔎 NEW: allow searching by dietary restrictions
-    const dietaryMatch = (recipe.dietaryRestrictions ?? []).some((restriction) =>
-      restriction.toLowerCase().includes(normalizedSearch)
-    );
-
-    return nameMatch || ingredientsMatch || tagsMatch || dietaryMatch;
+    // ✅ ALL search words must appear somewhere in the recipe
+    return searchWords.every((word) => haystack.includes(word));
   });
 
   return (
@@ -55,7 +58,6 @@ export default function RecipeListClient({ initialRecipes }: RecipeListClientPro
             <Search />
           </InputGroup.Text>
 
-          {/* 🔎 Accessible name for Playwright: "Search recipes" */}
           <Form.Control
             id="recipe-search"
             aria-label="Search recipes"
@@ -73,7 +75,6 @@ export default function RecipeListClient({ initialRecipes }: RecipeListClientPro
           {filteredRecipes.map((recipe) => (
             <Col
               key={recipe.id}
-              // 🧪 for tests/recipes-page.spec.ts
               data-testid={`recipe-card-${recipe.id}`}
             >
               <RecipeCard recipe={recipe} />
