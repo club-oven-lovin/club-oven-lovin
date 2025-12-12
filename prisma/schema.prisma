@@ -1,44 +1,21 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  // for local development
-   url      = env("DATABASE_URL")
-  // for Vercel
-  // url       = env("POSTGRES_PRISMA_URL")
-  // directUrl = env("POSTGRES_URL_NON_POOLING")
-}
-
-enum Role {
-  USER
-  ADMIN
-  VENDOR
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id                  Int      @id @default(autoincrement())
-  email               String   @unique
+  id                  Int        @id @default(autoincrement())
+  email               String     @unique
   password            String
-  role                Role     @default(USER)
-
-  name                String?   // optional, safe for existing users
-  image               String?   // optional
-  dietaryRestrictions String[] @default([])  // empty array for existing users
-}
-
-enum Condition {
-  excellent
-  good
-  fair
-  poor
+  role                Role       @default(USER)
+  dietaryRestrictions String[]   @default([])
+  image               String?
+  name                String?
+  Favorite            Favorite[]
 }
 
 model Stuff {
@@ -49,43 +26,76 @@ model Stuff {
   owner     String
 }
 
-// Vendor Things
 model Vendor {
-  id          String        @id @default(uuid())
-  owner       String @unique        // email of logged-in user
+  id          String       @id @default(uuid())
+  owner       String       @unique
   name        String
   address     String?
   hours       String?
-
   ingredients Ingredient[]
 }
 
 model Ingredient {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   owner     String
   vendorId  String?
-  vendor    Vendor?  @relation(fields: [vendorId], references: [id])
-
   name      String
-  price     Float
   size      String
-  available Boolean  @default(true)
+  available Boolean @default(true)
+  price     Float
+  vendor    Vendor? @relation(fields: [vendorId], references: [id])
 }
 
 model Recipe {
-  id                  Int      @id @default(autoincrement())
+  id                  Int        @id @default(autoincrement())
   name                String
   image               String
-  ingredients         String   
-  steps               String   
-  tags                String[] 
-  dietaryRestrictions String[] 
+  ingredients         String
+  steps               String
+  tags                String[]
+  dietaryRestrictions String[]
   owner               String
-  createdAt           DateTime @default(now())
+  createdAt           DateTime   @default(now())
+  favorites           Favorite[]
+  reviews             Review[]
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  recipeId  Int
+  recipe    Recipe   @relation(fields: [recipeId], references: [id])
+  reviewer  String   // Name provided or "Anonymous"
+  owner     String?  // Email of user if logged in (for ownership/deletion)
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
 }
 
 model PageVisit {
   id        Int      @id @default(autoincrement())
   path      String
   createdAt DateTime @default(now())
+}
+
+model Favorite {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  recipeId Int
+  Recipe   Recipe @relation(fields: [recipeId], references: [id])
+  User     User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, recipeId])
+}
+
+enum Role {
+  USER
+  ADMIN
+  VENDOR
+}
+
+enum Condition {
+  excellent
+  good
+  fair
+  poor
 }
