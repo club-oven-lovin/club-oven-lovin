@@ -3,8 +3,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Form, Button } from 'react-bootstrap';
 import type { Recipe } from '@prisma/client';
+import ImageUploader from './ImageUploader';
+import { toast } from 'sonner';
 
 interface EditRecipeFormProps {
   recipe: Recipe;
@@ -21,12 +23,33 @@ export default function EditRecipeForm({ recipe }: EditRecipeFormProps) {
   const [dietaryRestrictions, setDietaryRestrictions] = useState(
     recipe.dietaryRestrictions.join(', ')
   );
-  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const validateForm = (): boolean => {
+    const missingFields: string[] = [];
+
+    if (!name.trim()) missingFields.push('Recipe Name');
+    if (!image.trim()) missingFields.push('Recipe Image');
+    if (!ingredients.trim()) missingFields.push('Ingredients');
+    if (!steps.trim()) missingFields.push('Steps');
+    if (!tags.trim()) missingFields.push('Tags');
+
+    if (missingFields.length > 0) {
+      toast.error('Please check your input', {
+        description: `Missing: ${missingFields.join(', ')}`,
+      });
+      return false;
+    }
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+
+    if (!validateForm()) {
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -42,7 +65,6 @@ export default function EditRecipeForm({ recipe }: EditRecipeFormProps) {
           dietaryRestrictions: dietaryRestrictions
             ? dietaryRestrictions.split(',').map((d) => d.trim())
             : [],
-          // owner: recipe.owner,
         }),
       });
 
@@ -50,61 +72,69 @@ export default function EditRecipeForm({ recipe }: EditRecipeFormProps) {
         throw new Error(`Failed to update recipe: ${res.status}`);
       }
 
-      // Go back to the recipe detail page
+      toast.success('Recipe updated successfully!', {
+        description: 'Redirecting to recipe page...',
+      });
       router.push(`/recipes/${recipe.id}`);
       router.refresh();
     } catch (err) {
       console.error(err);
-      setError('Something went wrong saving the recipe.');
+      toast.error('Failed to update recipe', {
+        description: 'Please try again.',
+      });
     } finally {
       setSaving(false);
     }
   };
 
+  const handleCancel = () => {
+    router.push(`/recipes/${recipe.id}`);
+  };
+
   return (
     <Form onSubmit={handleSubmit} className="mt-3 mb-4">
-      {error && <Alert variant="danger">{error}</Alert>}
-
       <Form.Group className="mb-3">
-        <Form.Label>Recipe Name</Form.Label>
+        <Form.Label>Recipe Name <span className="text-danger">*</span></Form.Label>
         <Form.Control
           value={name}
           onChange={(e) => setName(e.target.value)}
-          required
+          placeholder="Enter recipe name"
         />
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Image URL</Form.Label>
-        <Form.Control
+        <Form.Label>Recipe Image <span className="text-danger">*</span></Form.Label>
+        <ImageUploader
           value={image}
-          onChange={(e) => setImage(e.target.value)}
-          placeholder="https://example.com/photo.jpg"
+          onChange={setImage}
+          disabled={saving}
         />
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Ingredients</Form.Label>
+        <Form.Label>Ingredients <span className="text-danger">*</span></Form.Label>
         <Form.Control
           as="textarea"
           rows={4}
           value={ingredients}
           onChange={(e) => setIngredients(e.target.value)}
+          placeholder="Enter ingredients"
         />
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Steps / Instructions</Form.Label>
+        <Form.Label>Steps / Instructions <span className="text-danger">*</span></Form.Label>
         <Form.Control
           as="textarea"
           rows={6}
           value={steps}
           onChange={(e) => setSteps(e.target.value)}
+          placeholder="Enter cooking steps"
         />
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Tags (comma-separated)</Form.Label>
+        <Form.Label>Tags (comma-separated) <span className="text-danger">*</span></Form.Label>
         <Form.Control
           value={tags}
           onChange={(e) => setTags(e.target.value)}
@@ -121,9 +151,26 @@ export default function EditRecipeForm({ recipe }: EditRecipeFormProps) {
         />
       </Form.Group>
 
-      <Button type="submit" disabled={saving}>
-        {saving ? 'Saving…' : 'Save Changes'}
-      </Button>
+      <div className="d-flex gap-2">
+        <Button
+          type="button"
+          variant="outline-secondary"
+          onClick={handleCancel}
+          disabled={saving}
+          style={{
+            backgroundColor: 'white',
+            color: '#333',
+            borderColor: '#ccc',
+          }}
+        >
+          Cancel
+        </Button>
+        <Button type="submit" disabled={saving}>
+          {saving ? 'Saving…' : 'Save'}
+        </Button>
+      </div>
     </Form>
   );
 }
+
+

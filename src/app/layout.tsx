@@ -5,6 +5,7 @@ import './globals.css';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import Providers from './providers';
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,6 +23,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} h-100 d-flex flex-column min-vh-100`}>
         <Providers>
+          <Toaster
+            position="top-center"
+            richColors
+            closeButton
+          />
           <Navbar />
           <main className="flex-grow-1">
             {children}
@@ -32,3 +38,4 @@ export default function RootLayout({
     </html>
   );
 }
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react"; // Added useEffect
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -8,6 +8,8 @@ import { AddRecipeSchema } from "@/lib/validationSchemas";
 import { useRouter } from "next/navigation";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import LoadingSpinner from "./LoadingSpinner";
+import ImageUploader from "./ImageUploader";
+import { toast } from "sonner";
 
 type AddRecipeFormData = {
   name: string;
@@ -45,7 +47,15 @@ export default function AddRecipeForm() {
     if (session?.user?.email) {
       setValue("owner", session.user.email);
     }
-  }, [session, setValue]); // Dependency array includes session and setValue
+  }, [session, setValue]);
+
+  // Track image URL separately for the ImageUploader
+  const [imageUrl, setImageUrl] = useState('');
+
+  // Sync imageUrl with form
+  useEffect(() => {
+    setValue('image', imageUrl);
+  }, [imageUrl, setValue]);
 
   const owner = session?.user?.email ?? ""; // Kept for consistency if needed elsewhere, but setValue handles the form state
 
@@ -57,7 +67,6 @@ export default function AddRecipeForm() {
 
   // Form submit handler (calls API route)
   const onSubmit = async (data: AddRecipeFormData) => {
-    console.log("onSubmit function called!"); // Debugging log
     try {
       const payload = { ...data, owner };
       const res = await fetch('/api/recipes', {
@@ -69,22 +78,36 @@ export default function AddRecipeForm() {
         const text = await res.text();
         throw new Error(text || 'Failed to create recipe');
       }
-      // Redirect to browse page after successful create
+      toast.success('Recipe created successfully!', {
+        description: 'Redirecting to browse page...',
+      });
       router.push('/browse-recipes');
     } catch (err) {
-      // Minimal error handling: log and alert
-      // You can replace with a nicer UI notification later
-      // eslint-disable-next-line no-console
       console.error('Error creating recipe:', err);
-      // eslint-disable-next-line no-alert
-      alert('Could not create recipe. See console for details.');
+      toast.error('Failed to create recipe', {
+        description: 'Please try again.',
+      });
     }
   };
 
-  // TEMPORARY DEBUGGING LOGS - REMOVE THESE LATER
-  console.log("Form State:", { errors, isSubmitting });
-  console.log("Current Form Values:", getValues());
-  // END TEMPORARY DEBUGGING LOGS
+  // Handle validation errors with toast
+  const onFormError = () => {
+    // Build error message list
+    const errorMessages: string[] = [];
+    if (errors.name) errorMessages.push('Recipe Name');
+    if (errors.image || !imageUrl) errorMessages.push('Recipe Image');
+    if (errors.ingredients) errorMessages.push('Ingredients');
+    if (errors.steps) errorMessages.push('Steps');
+    if (errors.tags) errorMessages.push('Tags');
+
+    if (errorMessages.length > 0) {
+      toast.error('Please check your input', {
+        description: `Missing: ${errorMessages.join(', ')}`,
+      });
+    }
+  };
+
+
 
   return (
     <Container className="py-4">
@@ -100,26 +123,28 @@ export default function AddRecipeForm() {
           <Card>
             <Card.Body>
               <Form
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit(onSubmit, onFormError)}
                 data-testid="add-recipe-form"
               >
-                {/* NAME + IMAGE */}
-                <Row>
-                  <Col>
-                    <Form.Group data-testid="recipe-name-field">
-                      <Form.Label>Recipe Name</Form.Label>
-                      <Form.Control type="text" {...register("name")} isInvalid={!!errors.name} />
-                      <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group data-testid="recipe-image-field">
-                      <Form.Label>Picture URL</Form.Label>
-                      <Form.Control type="text" {...register("image")} isInvalid={!!errors.image} />
-                      <Form.Control.Feedback type="invalid">{errors.image?.message}</Form.Control.Feedback>
-                    </Form.Group>
-                  </Col>
-                </Row>
+                {/* NAME */}
+                <Form.Group data-testid="recipe-name-field" className="mb-3">
+                  <Form.Label>Recipe Name</Form.Label>
+                  <Form.Control type="text" {...register("name")} isInvalid={!!errors.name} />
+                  <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
+                </Form.Group>
+
+                {/* IMAGE UPLOAD */}
+                <Form.Group data-testid="recipe-image-field" className="mb-3">
+                  <Form.Label>Recipe Image</Form.Label>
+                  <ImageUploader
+                    value={imageUrl}
+                    onChange={setImageUrl}
+                    disabled={isSubmitting}
+                  />
+                  {errors.image && (
+                    <div className="text-danger small mt-1">{errors.image.message}</div>
+                  )}
+                </Form.Group>
 
                 {/* INGREDIENTS */}
                 <Form.Group className="mt-3" data-testid="recipe-ingredients-field">

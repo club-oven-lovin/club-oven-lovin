@@ -100,3 +100,12 @@ enum Role {
   ADMIN
   VENDOR
 }
+
+model UploadedImage {
+  id        String   @id @default(uuid())
+  url       String   // Vercel Blob URL
+  pathname  String   // Blob storage path
+  size      Int      // File size in bytes
+  owner     String   // Uploader's email
+  createdAt DateTime @default(now())
+}
