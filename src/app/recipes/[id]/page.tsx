@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import authOptions from '@/lib/authOptions';
+import FavoriteButton from '@/components/FavoriteButton';
 
 const cleanIngredient = (ingredient: string) =>
   ingredient
@@ -31,16 +32,14 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
     return notFound();
   }
 
-  // ⭐ Get logged-in user (if any)
   interface SessionUserWithId {
-  id?: string;
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
-}
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  }
 
-const session = await getServerSession(authOptions);
-const userId = session?.user ? Number((session.user as SessionUserWithId).id) : null;
+  const userId = session?.user ? Number((session.user as SessionUserWithId).id) : null;
 
   const recipe = await prisma.recipe.findUnique({
     where: { id: recipeId },
@@ -81,6 +80,14 @@ const userId = session?.user ? Number((session.user as SessionUserWithId).id) : 
     ),
   }));
 
+  let isFavorited = false;
+  if (userId) {
+    const favorite = await prisma.favorite.findFirst({
+      where: { userId, recipeId },
+    });
+    isFavorited = Boolean(favorite);
+  }
+
   return (
     <main className="py-5">
       <div className="container">
@@ -101,7 +108,7 @@ const userId = session?.user ? Number((session.user as SessionUserWithId).id) : 
                 <p className="text-muted mb-3">
                   By {recipe.owner || 'Unknown chef'}
                 </p>
-
+              
                 {canEdit && (
                   <Link
                     href={`/recipes/${recipe.id}/edit`}
@@ -109,6 +116,17 @@ const userId = session?.user ? Number((session.user as SessionUserWithId).id) : 
                   >
                     Edit recipe
                   </Link>
+                )}
+
+                {userId && (
+                  <div className="d-flex justify-content-center mb-3">
+                    <FavoriteButton
+                      recipeId={recipe.id}
+                      userId={userId}
+                      isFavorited={isFavorited}
+                      className="w-100"
+                    />
+                  </div>
                 )}
 
                 <h6 className="fw-semibold">Tags</h6>

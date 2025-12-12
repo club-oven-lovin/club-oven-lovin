@@ -8,9 +8,10 @@ interface Props {
   recipeId: number;
   userId: number;
   isFavorited: boolean;
+  className?: string;
 }
 
-export default function FavoriteButton({ recipeId, userId, isFavorited }: Props) {
+export default function FavoriteButton({ recipeId, userId, isFavorited, className }: Props) {
   const [favorited, setFavorited] = useState(isFavorited);
 
   async function handleClick() {
@@ -24,6 +25,7 @@ export default function FavoriteButton({ recipeId, userId, isFavorited }: Props)
     <Button
       variant={favorited ? "danger" : "outline-danger"}
       onClick={handleClick}
+      className={className}
     >
       {favorited ? "♥ Favorited" : "♡ Favorite"}
     </Button>
