@@ -3,12 +3,13 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import authOptions from '@/lib/authOptions';
 import { loggedInProtectedPage } from '@/lib/page-protection';
 import KitchenTipsCard from '@/components/KitchenTipsCard';
+import RecipeCard from '@/components/RecipeCard';
 import { prisma } from '@/lib/prisma';
 
 const actionButtons = [
   {
     label: 'Search Recipes',
-    href: '/recipes/search',
+    href: '/browse-recipes',
     description: 'Dial in on cuisines, ingredients, and dietary filters instantly.',
     accentStart: '#fffdfa',
     accentEnd: '#f4efe7',
@@ -27,13 +28,6 @@ const actionButtons = [
     accentStart: '#fff8f0',
     accentEnd: '#f1ebe2',
   },
-];
-
-const recommendationAccents = [
-  { accentStart: '#fffdfa', accentEnd: '#f4efe7' },
-  { accentStart: '#fff9f2', accentEnd: '#f2ece3' },
-  { accentStart: '#fff8f0', accentEnd: '#f1ebe2' },
-  { accentStart: '#fff7ee', accentEnd: '#efe9e0' },
 ];
 
 const kitchenTips = [
@@ -75,41 +69,34 @@ const UserHomePage = async () => {
 
   loggedInProtectedPage(session);
   const displayName = session?.user?.name ?? 'user';
-  const allRecipes = await prisma.recipe.findMany({
-    select: {
-      id: true,
-      name: true,
-      steps: true,
-      ingredients: true,
-      owner: true,
+
+  // Fetch recipes with reviews for rating calculation
+  const recipesWithReviews = await prisma.recipe.findMany({
+    include: {
+      reviews: {
+        select: { rating: true },
+      },
     },
   });
 
-  const shuffledRecipes = [...allRecipes];
-  for (let i = shuffledRecipes.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffledRecipes[i], shuffledRecipes[j]] = [shuffledRecipes[j], shuffledRecipes[i]];
-  }
-
-  const selectedRecipes = shuffledRecipes.slice(0, 4);
-  const recommendedRecipes = selectedRecipes.map((recipe, index) => {
-    const descriptionSource = recipe.steps || recipe.ingredients || '';
-    const normalized = descriptionSource.replace(/\s+/g, ' ').trim();
-    const description =
-      normalized.length > 0
-        ? normalized.slice(0, 110).concat(normalized.length > 110 ? '…' : '')
-        : 'Jump in to see the steps, ingredients, and community notes.';
-    const { accentStart, accentEnd } = recommendationAccents[index % recommendationAccents.length];
-
+  // Calculate average rating and sort by rating (highest first)
+  const recipesWithRating = recipesWithReviews.map((recipe) => {
+    const { reviews, ...recipeData } = recipe;
+    const totalRating = reviews.reduce((sum, r) => sum + r.rating, 0);
+    const averageRating = reviews.length > 0 ? totalRating / reviews.length : 0;
     return {
-      title: recipe.name,
-      description,
-      href: `/recipes/${recipe.id}`,
-      accentStart,
-      accentEnd,
+      ...recipeData,
+      averageRating,
+      reviewCount: reviews.length,
     };
   });
-  const hasRecommendations = recommendedRecipes.length > 0;
+
+  // Sort by average rating descending and take top 3
+  const topRatedRecipes = [...recipesWithRating]
+    .sort((a, b) => b.averageRating - a.averageRating)
+    .slice(0, 3);
+
+  const hasRecommendations = topRatedRecipes.length > 0;
 
   return (
     <main className="bg-body-tertiary min-vh-100">
@@ -195,38 +182,30 @@ const UserHomePage = async () => {
             </p>
             <h2 className="fw-bold mb-3" style={{ color: charcoal }}>Fresh ideas curated for you</h2>
             <p className="mb-0" style={{ color: 'rgba(42, 42, 42, 0.65)' }}>
-              Based on your saved tags, pantry staples, and what the community cannot stop cooking.
+              Top-rated recipes loved by the community.
             </p>
           </div>
 
           {hasRecommendations ? (
-            <Row className="g-4">
-              {recommendedRecipes.map(({ title, description, href, accentStart, accentEnd }) => (
-                <Col key={title} xs={12} md={6} lg={3}>
-                  <div
-                    className="h-100 rounded-4 p-4 text-dark shadow-sm border-0 position-relative overflow-hidden"
-                    style={{
-                      background: `linear-gradient(135deg, ${accentStart}, ${accentEnd})`,
-                      boxShadow: '0 1.25rem 2rem rgba(255, 107, 53, 0.1)',
-                    }}
-                  >
-                    <h3 className="h5 fw-semibold" style={{ color: charcoal }}>{title}</h3>
-                    <p className="mb-4" style={{ color: 'rgba(42, 42, 42, 0.7)' }}>
-                      {description}
-                    </p>
-                    <Button
-                      href={href}
-                      variant="light"
-                      size="sm"
-                      className="text-uppercase fw-semibold px-3"
-                      style={{ color: charcoal, borderColor: charcoal }}
-                    >
-                      View recipe
-                    </Button>
-                  </div>
-                </Col>
-              ))}
-            </Row>
+            <>
+              <Row className="g-4 justify-content-center">
+                {topRatedRecipes.map((recipe) => (
+                  <Col key={recipe.id} xs={12} sm={6} lg={4}>
+                    <RecipeCard recipe={recipe} />
+                  </Col>
+                ))}
+              </Row>
+              <div className="text-center mt-4">
+                <Button
+                  href="/browse-recipes"
+                  size="lg"
+                  className="text-uppercase fw-semibold px-5"
+                  style={{ backgroundColor: brandColor, borderColor: brandColor }}
+                >
+                  Discover Delicious
+                </Button>
+              </div>
+            </>
           ) : (
             <p className="text-center text-muted mb-0">
               Add your first recipe to start seeing personalized recommendations here.
@@ -240,3 +219,4 @@ const UserHomePage = async () => {
 };
 
 export default UserHomePage;
+

@@ -12,17 +12,19 @@ import { Search } from 'react-bootstrap-icons';
 import RecipeCard from '@/components/RecipeCard';
 import type { Recipe } from '@prisma/client';
 
-// Extended recipe type with average rating data
+// Extended recipe type with average rating data and favorite status
 type RecipeWithRating = Recipe & {
   averageRating: number;
   reviewCount: number;
+  isFavorited?: boolean;
 };
 
 interface RecipeListClientProps {
   initialRecipes: RecipeWithRating[];
+  userId?: number | null;
 }
 
-export default function RecipeListClient({ initialRecipes }: RecipeListClientProps) {
+export default function RecipeListClient({ initialRecipes, userId = null }: RecipeListClientProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const normalizedSearch = searchTerm.toLowerCase().trim();
@@ -83,7 +85,11 @@ export default function RecipeListClient({ initialRecipes }: RecipeListClientPro
               key={recipe.id}
               data-testid={`recipe-card-${recipe.id}`}
             >
-              <RecipeCard recipe={recipe} />
+              <RecipeCard
+                recipe={recipe}
+                userId={userId}
+                isFavorited={recipe.isFavorited ?? false}
+              />
             </Col>
           ))}
         </Row>
@@ -91,3 +97,4 @@ export default function RecipeListClient({ initialRecipes }: RecipeListClientPro
     </Container>
   );
 }
+

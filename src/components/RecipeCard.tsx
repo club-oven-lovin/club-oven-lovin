@@ -2,8 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Badge, Card } from 'react-bootstrap';
+import { Badge, Card, Button } from 'react-bootstrap';
 import StarRating from '@/components/StarRating';
+import FavoriteHeart from '@/components/FavoriteHeart';
 import type { Recipe as MarketingRecipe } from '@/lib/recipeData';
 import type { Recipe as PrismaRecipe } from '@prisma/client';
 
@@ -17,6 +18,12 @@ type RecipeCardRecipe = MarketingRecipe | RecipeWithRating;
 
 interface RecipeCardProps {
   recipe: RecipeCardRecipe;
+  // Favorite heart props
+  userId?: number | null;
+  isFavorited?: boolean;
+  // Profile page props
+  showEditButton?: boolean;
+  hideOwner?: boolean;
 }
 
 const hasMarketingFields = (
@@ -33,7 +40,13 @@ const hasRatingData = (recipe: RecipeCardRecipe): recipe is RecipeWithRating =>
 // Maximum number of visible tags (combined tags + dietary restrictions)
 const MAX_VISIBLE_TAGS = 4;
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({
+  recipe,
+  userId = null,
+  isFavorited = false,
+  showEditButton = false,
+  hideOwner = false,
+}) => {
   const time = hasMarketingFields(recipe) ? recipe.time ?? 'N/A' : 'N/A';
   const tags = hasDietaryData(recipe) ? recipe.tags : [];
   const dietaryRestrictions = hasDietaryData(recipe)
@@ -52,12 +65,11 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
   return (
     <Card
-      as={Link}
-      href={href}
       className="h-100 shadow-sm border-0 recipe-card-custom text-decoration-none"
       data-testid={`recipe-card-${recipe.id}`}
     >
-      <div className="recipe-card-image-container">
+      {/* Image container with favorite heart */}
+      <Link href={href} className="recipe-card-image-container position-relative d-block">
         <Image
           src={recipe.image || '/images/placeholder.png'}
           alt={recipe.name || 'Recipe'}
@@ -66,9 +78,15 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
           className="card-img-top recipe-card-image"
           style={{ objectFit: 'cover' }}
         />
-      </div>
+        {/* Favorite Heart Icon */}
+        <FavoriteHeart
+          recipeId={recipe.id}
+          userId={userId}
+          isFavorited={isFavorited}
+        />
+      </Link>
 
-      <Card.Body className="d-flex flex-column">
+      <Card.Body as={Link} href={href} className="d-flex flex-column text-decoration-none">
         <Card.Title className="fw-bold fs-6 mb-1" style={{ color: '#343a40' }}>
           {recipe.name}
         </Card.Title>
@@ -110,11 +128,24 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
       </Card.Body>
 
       <Card.Footer className="bg-white border-0 small text-muted">
-        By: {recipe.owner}
+        {showEditButton ? (
+          <Button
+            href={`/recipes/${recipe.id}/edit`}
+            size="sm"
+            variant="outline-primary"
+            className="w-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Edit
+          </Button>
+        ) : hideOwner ? null : (
+          <>By: {recipe.owner}</>
+        )}
       </Card.Footer>
     </Card>
   );
 };
 
 export default RecipeCard;
+
 

@@ -2,6 +2,13 @@
 
 import { Container, Row, Col, Card, Badge, Button, Image } from 'react-bootstrap';
 import type { Recipe, User as UserType } from '@prisma/client';
+import RecipeCard from '@/components/RecipeCard';
+
+// Extended recipe type for rating display
+type RecipeWithRating = Recipe & {
+  averageRating?: number;
+  reviewCount?: number;
+};
 
 export default function UserProfile({
   user,
@@ -9,8 +16,8 @@ export default function UserProfile({
   favoriteRecipes,
 }: {
   user: UserType;
-  contributedRecipes: Recipe[];
-  favoriteRecipes: Recipe[];
+  contributedRecipes: RecipeWithRating[];
+  favoriteRecipes: RecipeWithRating[];
 }) {
   // Helper to get initials from name
   const getInitials = (name: string | null) => {
@@ -89,49 +96,12 @@ export default function UserProfile({
         ) : (
           <Row className="g-3 mb-4">
             {contributedRecipes.map((recipe) => (
-              <Col key={recipe.id} xs={12} md={4}>
-                <Card className="shadow-sm userprofile-card h-100">
-                  <div
-                    className="userprofile-card-accent d-flex align-items-center justify-content-center"
-                    style={{ height: '120px' }}
-                  >
-                    {recipe.image ? (
-                      <Image
-                        src={recipe.image}
-                        alt={recipe.name}
-                        style={{ height: '120px', width: '100%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <>Image of {recipe.name}</>
-                    )}
-                  </div>
-
-                  <div className="p-3">
-                    {recipe.tags.map((tag) => (
-                      <Badge key={tag} className="me-2 mb-2 userprofile-tag-badge">
-                        {tag}
-                      </Badge>
-                    ))}
-
-                    {recipe.dietaryRestrictions.map((d) => (
-                      <Badge key={d} className="me-2 mb-2 userprofile-diet-badge">
-                        {d}
-                      </Badge>
-                    ))}
-
-                    <h6 className="userprofile-card-title mt-2">{recipe.name}</h6>
-
-                    <div className="d-flex gap-2 mt-3">
-                      <Button href={`/recipes/${recipe.id}`} variant="outline-dark" size="sm">
-                        View
-                      </Button>
-
-                      <Button href={`/recipes/${recipe.id}/edit`} size="sm" className="userprofile-edit-btn">
-                        Edit
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
+              <Col key={recipe.id} xs={12} sm={6} md={4}>
+                <RecipeCard
+                  recipe={recipe}
+                  showEditButton
+                  hideOwner
+                />
               </Col>
             ))}
           </Row>
@@ -144,43 +114,8 @@ export default function UserProfile({
         ) : (
           <Row className="g-3">
             {favoriteRecipes.map((recipe) => (
-              <Col key={recipe.id} xs={12} md={4}>
-                <Card className="shadow-sm userprofile-card h-100">
-                  <div
-                    className="userprofile-card-accent d-flex align-items-center justify-content-center"
-                    style={{ height: '120px' }}
-                  >
-                    {recipe.image ? (
-                      <Image
-                        src={recipe.image}
-                        alt={recipe.name}
-                        style={{ height: '120px', width: '100%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <>Image of {recipe.name}</>
-                    )}
-                  </div>
-
-                  <div className="p-3">
-                    {recipe.tags.map((tag) => (
-                      <Badge key={tag} className="me-2 mb-2 userprofile-tag-badge">
-                        {tag}
-                      </Badge>
-                    ))}
-
-                    {recipe.dietaryRestrictions.map((d) => (
-                      <Badge key={d} className="me-2 mb-2 userprofile-diet-badge">
-                        {d}
-                      </Badge>
-                    ))}
-
-                    <h6 className="userprofile-card-title mt-2">{recipe.name}</h6>
-
-                    <Button href={`/recipes/${recipe.id}`} variant="outline-dark" size="sm" className="mt-2">
-                      View
-                    </Button>
-                  </div>
-                </Card>
+              <Col key={recipe.id} xs={12} sm={6} md={4}>
+                <RecipeCard recipe={recipe} />
               </Col>
             ))}
           </Row>
