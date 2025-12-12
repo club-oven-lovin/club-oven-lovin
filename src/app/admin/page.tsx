@@ -19,10 +19,10 @@ type QuickAction = {
 };
 
 const statCards = [
-  { label: 'Total Users', value: 342, backgroundClass: 'bg-blue-600' },
-  { label: 'Total Recipes', value: 156, backgroundClass: 'bg-rose-500' },
-  { label: 'Total Vendors', value: 28, backgroundClass: 'bg-emerald-500' },
-  { label: 'Pending Reviews', value: 7, backgroundClass: 'bg-orange-500' },
+  { label: 'Total Users', value: 342, accentStart: '#fff3ec', accentEnd: '#ffd1b8' },
+  { label: 'Total Recipes', value: 156, accentStart: '#fff1ea', accentEnd: '#ffc8a5' },
+  { label: 'Total Vendors', value: 28, accentStart: '#fff5ee', accentEnd: '#ffd9c0' },
+  { label: 'Pending Reviews', value: 7, accentStart: '#fff0e7', accentEnd: '#ffcba6' },
 ];
 
 const quickActionItems: QuickAction[] = [
@@ -88,17 +88,22 @@ const AdminPage = async () => {
 
   return (
     <AdminDashboardLayout>
-      <section className="space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-indigo-500">Control Center</p>
-        <h1 className="text-3xl font-bold text-slate-900">Admin Dashboard</h1>
-        <p className="text-base text-slate-600">
+      <section
+        className="rounded-3xl p-8 text-white shadow-lg"
+        style={{ background: `linear-gradient(120deg, #ff6b35, #ff9248)` }}
+      >
+        <p className="text-xs font-bold uppercase tracking-[0.2em] opacity-80">Control Center</p>
+        <h1 className="mt-2 text-4xl font-bold">Admin Dashboard</h1>
+        <p className="mt-3 max-w-2xl text-lg opacity-90">
           Monitor the Toaster Oven Lovin&apos; platform, respond to recent reports, and jump into frequent admin tasks.
         </p>
       </section>
 
-      <section aria-label="System overview" className="space-y-4">
-        <h2 className="text-xl font-semibold text-slate-900">System Overview</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section aria-label="System overview" className="space-y-6">
+        <h2 className="text-2xl font-bold" style={{ color: '#2A2A2A' }}>
+          System Overview
+        </h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {statCards.map((stat) => (
             <StatCard key={stat.label} {...stat} />
           ))}
@@ -106,17 +111,22 @@ const AdminPage = async () => {
       </section>
 
       <section className="grid gap-8 lg:grid-cols-3" aria-label="Admin actions and reports">
-        <div className="space-y-4 rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm lg:col-span-2">
-          <h2 className="text-xl font-semibold text-slate-900">Quick Admin Actions</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-6 lg:col-span-2">
+          <h2 className="text-2xl font-bold" style={{ color: '#2A2A2A' }}>
+            Quick Admin Actions
+          </h2>
+          <div className="grid gap-6 sm:grid-cols-2">
             {quickActionItems.map((action) => (
               <QuickActionButton key={action.title} {...action} />
             ))}
           </div>
         </div>
-        <div className="space-y-4 rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-slate-900">Recent Reports</h2>
-          <ul className="space-y-4">
+
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold" style={{ color: '#2A2A2A' }}>
+            Recent Reports
+          </h2>
+          <ul className="space-y-6">
             {recentReports.map((report) => (
               <RecentReportItem key={report.title} {...report} />
             ))}
@@ -124,44 +134,51 @@ const AdminPage = async () => {
         </div>
       </section>
 
-      <section className="space-y-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-          Mock features: Static admin dashboard, approve/remove buttons (non-functional)
-        </p>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+            Mock features: Static admin dashboard preview
+          </p>
+        </div>
+
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="rounded-3xl bg-white p-8 shadow-sm">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-900">Users</h3>
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Preview</span>
+              <h3 className="text-xl font-bold" style={{ color: '#2A2A2A' }}>
+                Latest Users
+              </h3>
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-400">Preview</span>
             </div>
-            <div className="mt-4 overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200 text-sm">
-                <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <div className="mt-6 overflow-x-auto">
+              <table className="min-w-full divide-y divide-orange-100 text-sm">
+                <thead className="text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                   <tr>
-                    <th className="px-3 py-2">Handle</th>
-                    <th className="px-3 py-2">Role</th>
-                    <th className="px-3 py-2">Status</th>
-                    <th className="px-3 py-2">Actions</th>
+                    <th className="pb-3">Handle</th>
+                    <th className="pb-3">Role</th>
+                    <th className="pb-3">Status</th>
+                    <th className="pb-3">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
+                <tbody className="divide-y divide-orange-50">
                   {userPreview.map((user) => (
                     <tr key={user.handle}>
-                      <td className="whitespace-nowrap px-3 py-3 font-semibold text-slate-900">{user.handle}</td>
-                      <td className="whitespace-nowrap px-3 py-3 text-slate-600">{user.role}</td>
-                      <td className="whitespace-nowrap px-3 py-3 text-emerald-600">{user.status}</td>
-                      <td className="whitespace-nowrap px-3 py-3 text-sm">
+                      <td className="whitespace-nowrap py-4 font-bold" style={{ color: '#2A2A2A' }}>
+                        {user.handle}
+                      </td>
+                      <td className="whitespace-nowrap py-4 text-slate-600">{user.role}</td>
+                      <td className="whitespace-nowrap py-4 font-medium text-emerald-600">{user.status}</td>
+                      <td className="whitespace-nowrap py-4 text-sm">
                         <button
                           type="button"
-                          className="text-indigo-600 hover:text-indigo-500"
+                          className="font-semibold text-[#2A2A2A] hover:underline"
                           aria-disabled="true"
                         >
                           Edit
                         </button>
-                        <span className="px-2 text-slate-300">|</span>
+                        <span className="px-3 text-slate-300">|</span>
                         <button
                           type="button"
-                          className="text-rose-500 hover:text-rose-400"
+                          className="font-semibold text-rose-500 hover:text-rose-600"
                           aria-disabled="true"
                         >
                           Delete
@@ -174,27 +191,30 @@ const AdminPage = async () => {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-slate-900">Recipes Pending Review</h3>
-            <div className="mt-4 space-y-4">
+          <div className="rounded-3xl bg-white p-8 shadow-sm">
+            <h3 className="text-xl font-bold" style={{ color: '#2A2A2A' }}>
+              Recipes Pending Review
+            </h3>
+            <div className="mt-6 space-y-4">
               {pendingRecipes.map((recipe) => (
                 <div
                   key={recipe.title}
-                  className="rounded-2xl border border-slate-100 bg-slate-50 p-4 shadow-inner"
+                  className="rounded-2xl border border-orange-100 bg-orange-50/50 p-5 transition hover:bg-orange-50"
                 >
-                  <p className="font-semibold text-slate-900">{recipe.title}</p>
+                  <p className="font-bold text-[#2A2A2A]">{recipe.title}</p>
                   <p className="text-sm text-slate-600">Submitted by {recipe.author}</p>
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="mt-4 flex flex-wrap gap-3">
                     <button
                       type="button"
-                      className="rounded-full bg-emerald-500 px-4 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-600"
+                      className="rounded-full px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
+                      style={{ backgroundColor: '#2A2A2A' }}
                       aria-disabled="true"
                     >
                       Approve
                     </button>
                     <button
                       type="button"
-                      className="rounded-full border border-rose-200 px-4 py-1.5 text-sm font-semibold text-rose-500 shadow-sm hover:bg-rose-50"
+                      className="rounded-full border border-rose-200 px-5 py-2 text-sm font-bold text-rose-500 transition hover:bg-rose-50"
                       aria-disabled="true"
                     >
                       Remove
