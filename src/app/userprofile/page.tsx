@@ -24,8 +24,13 @@ export default async function UserProfilePage() {
     where: { owner: session.user.email },
   });
 
-  // TODO: Replace with real favorites once implemented
-  const favoriteRecipes: typeof contributedRecipes = [];
+  const favoriteRecipes = await prisma.recipe.findMany({
+    where: {
+      favorites: {
+        some: { userId: user.id }, // fetch recipes where this user has a favorite
+      },
+    },
+  });
 
   return (
     <UserProfile

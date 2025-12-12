@@ -4,7 +4,11 @@ import { prisma } from '@/lib/prisma';
 import { Container, Badge, Button } from 'react-bootstrap';
 import Image from 'next/image';
 import Link from 'next/link';
+import FavoriteButton from '@/components/FavoriteButton';
 import DeleteRecipeButton from '@/components/DeleteRecipeButton';
+import { getServerSession } from "next-auth";
+import authOptions from "@/lib/authOptions";
+
 
 interface RecipePageProps {
   params: { id: string };
@@ -16,6 +20,17 @@ export default async function RecipePage({ params }: RecipePageProps) {
     notFound();
   }
 
+  // ⭐ Get logged-in user (if any)
+  interface SessionUserWithId {
+  id?: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}
+
+const session = await getServerSession(authOptions);
+const userId = session?.user ? Number((session.user as SessionUserWithId).id) : null;
+
   const recipe = await prisma.recipe.findUnique({
     where: { id: recipeId },
   });
@@ -24,9 +39,29 @@ export default async function RecipePage({ params }: RecipePageProps) {
     notFound();
   }
 
+  // ⭐ Is this recipe already favorited by the user?
+  let isFavorited = false;
+  if (userId) {
+    const fav = await prisma.favorite.findFirst({
+      where: { userId, recipeId },
+    });
+    isFavorited = !!fav;
+  }
+
   return (
     <Container className="py-4">
+      <div className="d-flex justify-content-between align-items-center">
       <h1 className="mb-3">{recipe.name}</h1>
+
+      {/* ⭐ Favorite Button appears here */}
+        {userId && (
+          <FavoriteButton
+            recipeId={recipe.id}
+            userId={userId}
+            isFavorited={isFavorited}
+          />
+        )}
+      </div>
 
       {recipe.image && (
         <div className="mb-4" style={{ maxWidth: 600 }}>
