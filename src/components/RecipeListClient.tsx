@@ -12,8 +12,14 @@ import { Search } from 'react-bootstrap-icons';
 import RecipeCard from '@/components/RecipeCard';
 import type { Recipe } from '@prisma/client';
 
+// Extended recipe type with average rating data
+type RecipeWithRating = Recipe & {
+  averageRating: number;
+  reviewCount: number;
+};
+
 interface RecipeListClientProps {
-  initialRecipes: Recipe[];
+  initialRecipes: RecipeWithRating[];
 }
 
 export default function RecipeListClient({ initialRecipes }: RecipeListClientProps) {
@@ -23,9 +29,9 @@ export default function RecipeListClient({ initialRecipes }: RecipeListClientPro
 
   const searchWords = normalizedSearch
     ? normalizedSearch
-        .split(/\s+/)
-        .map((w) => w.trim())
-        .filter((w) => w.length > 2)
+      .split(/\s+/)
+      .map((w) => w.trim())
+      .filter((w) => w.length > 2)
     : [];
 
   const filteredRecipes = initialRecipes.filter((recipe) => {

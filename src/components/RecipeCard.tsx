@@ -3,10 +3,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Badge, Card } from 'react-bootstrap';
+import StarRating from '@/components/StarRating';
 import type { Recipe as MarketingRecipe } from '@/lib/recipeData';
 import type { Recipe as PrismaRecipe } from '@prisma/client';
 
-type RecipeCardRecipe = MarketingRecipe | PrismaRecipe;
+// Extended recipe type with rating data
+type RecipeWithRating = PrismaRecipe & {
+  averageRating?: number;
+  reviewCount?: number;
+};
+
+type RecipeCardRecipe = MarketingRecipe | RecipeWithRating;
 
 interface RecipeCardProps {
   recipe: RecipeCardRecipe;
@@ -17,12 +24,16 @@ const hasMarketingFields = (
 ): recipe is MarketingRecipe =>
   'rating' in recipe && 'time' in recipe;
 
-const hasDietaryData = (recipe: RecipeCardRecipe): recipe is PrismaRecipe =>
+const hasDietaryData = (recipe: RecipeCardRecipe): recipe is RecipeWithRating =>
   'tags' in recipe && 'dietaryRestrictions' in recipe;
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
-  const primaryOrange = '#ff6b35';
+const hasRatingData = (recipe: RecipeCardRecipe): recipe is RecipeWithRating =>
+  'averageRating' in recipe && typeof recipe.averageRating === 'number';
 
+// Maximum number of visible tags (combined tags + dietary restrictions)
+const MAX_VISIBLE_TAGS = 4;
+
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const time = hasMarketingFields(recipe) ? recipe.time ?? 'N/A' : 'N/A';
   const tags = hasDietaryData(recipe) ? recipe.tags : [];
   const dietaryRestrictions = hasDietaryData(recipe)
@@ -30,6 +41,14 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
     : [];
 
   const href = `/recipes/${recipe.id}`;
+
+  // Combine all tags and calculate overflow
+  const allTags = [
+    ...tags.map((tag) => ({ label: tag, type: 'tag' as const })),
+    ...dietaryRestrictions.map((d) => ({ label: d, type: 'dietary' as const })),
+  ];
+  const visibleTags = allTags.slice(0, MAX_VISIBLE_TAGS);
+  const overflowCount = allTags.length - MAX_VISIBLE_TAGS;
 
   return (
     <Card
@@ -58,31 +77,34 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
           <Card.Subtitle className="mb-2 text-muted">{time}</Card.Subtitle>
         )}
 
-        {tags.length > 0 && (
-          <div className="mb-2 d-flex flex-wrap gap-1">
-            {tags.map((tag) => (
-              <Badge key={tag} bg="light" text="dark">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
+        {/* Tags container with fixed height for consistent layout */}
+        <div
+          className="d-flex flex-wrap gap-1 align-content-start"
+          style={{ minHeight: '52px' }} /* Fixed height for ~2 rows of badges */
+        >
+          {visibleTags.map((item) => (
+            <Badge
+              key={`${item.type}-${item.label}`}
+              bg={item.type === 'tag' ? 'warning' : 'success'}
+              text={item.type === 'tag' ? 'dark' : 'white'}
+            >
+              {item.label}
+            </Badge>
+          ))}
+          {overflowCount > 0 && (
+            <Badge bg="secondary" text="white">
+              +{overflowCount}
+            </Badge>
+          )}
+        </div>
 
-        {dietaryRestrictions.length > 0 && (
-          <div className="d-flex flex-wrap gap-1">
-            {dietaryRestrictions.map((d) => (
-              <Badge
-                key={d}
-                bg="light"
-                text="dark"
-                style={{
-                  border: `1px solid ${primaryOrange}`,
-                  color: primaryOrange,
-                }}
-              >
-                {d}
-              </Badge>
-            ))}
+        {/* Star Rating Display */}
+        {hasRatingData(recipe) && (
+          <div className="d-flex align-items-center gap-2 mt-2">
+            <span className="fw-semibold" style={{ color: '#ffc107', fontSize: '0.9rem' }}>
+              {recipe.averageRating!.toFixed(1)}
+            </span>
+            <StarRating rating={recipe.averageRating!} size={16} />
           </div>
         )}
       </Card.Body>
@@ -95,3 +117,4 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 };
 
 export default RecipeCard;
+
