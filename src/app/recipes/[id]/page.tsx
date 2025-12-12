@@ -1,7 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
+import authOptions from '@/lib/authOptions';
 
 const cleanIngredient = (ingredient: string) =>
   ingredient
@@ -21,6 +23,8 @@ const parseSteps = (steps: string) =>
     .filter((step) => step.length > 0);
 
 export default async function RecipeDetailPage({ params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  const currentUserEmail = session?.user?.email ?? null;
   const recipeId = Number(params.id);
 
   if (Number.isNaN(recipeId)) {
@@ -34,6 +38,8 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
   if (!recipe) {
     return notFound();
   }
+
+  const canEdit = !!currentUserEmail && recipe.owner === currentUserEmail;
 
   const parsedIngredients = parseIngredients(recipe.ingredients ?? '');
   const parsedSteps = parseSteps(recipe.steps ?? '');
@@ -84,6 +90,15 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
                 <p className="text-muted mb-3">
                   By {recipe.owner || 'Unknown chef'}
                 </p>
+
+                {canEdit && (
+                  <Link
+                    href={`/recipes/${recipe.id}/edit`}
+                    className="btn btn-outline-primary w-100 mb-3"
+                  >
+                    Edit recipe
+                  </Link>
+                )}
 
                 <h6 className="fw-semibold">Tags</h6>
                 <div className="mb-3">
