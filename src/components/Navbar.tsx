@@ -62,8 +62,8 @@ const NavBar: React.FC = () => {
                   Recipes
                 </Nav.Link>
 
-                {/* Add Recipe: normal users + admins */}
-                {(role === 'USER' || role === 'ADMIN') && (
+                {/* Add Recipe: normal users only */}
+                {role === 'USER' && (
                   <Nav.Link
                     href="/add-recipe"
                     className="mx-2 nav-link-white-orange-hover"
@@ -73,27 +73,7 @@ const NavBar: React.FC = () => {
                   </Nav.Link>
                 )}
 
-                {/* Vendors page: vendors + admins */}
-                {(role === 'VENDOR' || role === 'ADMIN') && (
-                  <Nav.Link
-                    href="/vendors"
-                    className="mx-2 nav-link-white-orange-hover"
-                    style={{ color: whiteColor }}
-                  >
-                    Vendors
-                  </Nav.Link>
-                )}
 
-                {/* Admin page: admins only */}
-                {role === 'ADMIN' && (
-                  <Nav.Link
-                    href="/admin"
-                    className="mx-2 nav-link-white-orange-hover"
-                    style={{ color: whiteColor }}
-                  >
-                    Admin
-                  </Nav.Link>
-                )}
               </>
             )}
           </Nav>
@@ -106,9 +86,19 @@ const NavBar: React.FC = () => {
                 title={<span style={{ color: whiteColor }}>{currentUser}</span>}
                 className="mx-2 nav-dropdown-white-text"
               >
-                <NavDropdown.Item id="login-dropdown-profile" href="/userprofile">
-                  User Profile
-                </NavDropdown.Item>
+                {role === 'ADMIN' ? (
+                  <NavDropdown.Item id="login-dropdown-admin" href="/admin">
+                    Admin Dashboard
+                  </NavDropdown.Item>
+                ) : role === 'VENDOR' ? (
+                  <NavDropdown.Item id="login-dropdown-vendor" href="/vendors">
+                    Vendor Dashboard
+                  </NavDropdown.Item>
+                ) : (
+                  <NavDropdown.Item id="login-dropdown-profile" href="/userprofile">
+                    User Profile
+                  </NavDropdown.Item>
+                )}
                 <NavDropdown.Divider />
                 <NavDropdown.Item id="login-dropdown-change-password" href="/auth/change-password">
                   <Lock />{' '}

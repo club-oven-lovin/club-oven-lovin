@@ -11,15 +11,17 @@ type QuickActionButtonProps = {
 const QuickActionButton: React.FC<QuickActionButtonProps> = ({ title, detail, icon, href }) => {
     const content = (
         <>
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600 text-white">{icon}</span>
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-sm" style={{ backgroundColor: '#2A2A2A' }}>
+                {icon}
+            </span>
             <div className="flex-1">
-                <p className="text-base font-semibold text-slate-900">{title}</p>
-                <p className="text-sm text-slate-600">{detail}</p>
+                <p className="text-base font-bold" style={{ color: '#2A2A2A' }}>{title}</p>
+                <p className="text-sm opacity-70" style={{ color: '#2A2A2A' }}>{detail}</p>
             </div>
         </>
     );
 
-    const className = "flex items-center gap-4 rounded-2xl border border-indigo-100 bg-white/80 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-lg";
+    const className = "flex items-center gap-4 rounded-3xl border border-orange-100 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"; // Updated classes
 
     if (href) {
         return (

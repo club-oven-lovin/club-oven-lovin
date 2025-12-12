@@ -1,23 +1,34 @@
-
-import { notFound } from 'next/navigation';
-import { prisma } from '@/lib/prisma';
-import { Container, Badge, Button } from 'react-bootstrap';
 import Image from 'next/image';
 import Link from 'next/link';
-import FavoriteButton from '@/components/FavoriteButton';
-import DeleteRecipeButton from '@/components/DeleteRecipeButton';
-import { getServerSession } from "next-auth";
-import authOptions from "@/lib/authOptions";
+import { notFound } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { prisma } from '@/lib/prisma';
+import authOptions from '@/lib/authOptions';
 
+const cleanIngredient = (ingredient: string) =>
+  ingredient
+    .replace(/^[-•\d\.\)\s]+/, '')
+    .trim();
 
-interface RecipePageProps {
-  params: { id: string };
-}
+const parseIngredients = (ingredients: string) =>
+  ingredients
+    .split(/\r?\n|,/)
+    .map((item) => cleanIngredient(item))
+    .filter((item) => item.length > 0);
 
-export default async function RecipePage({ params }: RecipePageProps) {
+const parseSteps = (steps: string) =>
+  steps
+    .split(/\r?\n/)
+    .map((step) => step.trim())
+    .filter((step) => step.length > 0);
+
+export default async function RecipeDetailPage({ params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  const currentUserEmail = session?.user?.email ?? null;
   const recipeId = Number(params.id);
+
   if (Number.isNaN(recipeId)) {
-    notFound();
+    return notFound();
   }
 
   // ⭐ Get logged-in user (if any)
@@ -36,84 +47,182 @@ const userId = session?.user ? Number((session.user as SessionUserWithId).id) : 
   });
 
   if (!recipe) {
-    notFound();
+    return notFound();
   }
 
-  // ⭐ Is this recipe already favorited by the user?
-  let isFavorited = false;
-  if (userId) {
-    const fav = await prisma.favorite.findFirst({
-      where: { userId, recipeId },
-    });
-    isFavorited = !!fav;
-  }
+  const canEdit = !!currentUserEmail && recipe.owner === currentUserEmail;
+
+  const parsedIngredients = parseIngredients(recipe.ingredients ?? '');
+  const parsedSteps = parseSteps(recipe.steps ?? '');
+  const tags = Array.isArray(recipe.tags) ? recipe.tags : [];
+  const dietaryRestrictions = Array.isArray(recipe.dietaryRestrictions)
+    ? recipe.dietaryRestrictions
+    : [];
+
+  const vendorIngredients = parsedIngredients.length
+    ? await prisma.ingredient.findMany({
+        where: {
+          available: true,
+          OR: parsedIngredients.map((name) => ({
+            name: {
+              equals: name,
+              mode: 'insensitive',
+            },
+          })),
+        },
+        include: { vendor: true },
+      })
+    : [];
+
+  const vendorByIngredient = parsedIngredients.map((ingredientName) => ({
+    name: ingredientName,
+    offers: vendorIngredients.filter(
+      (item) => item.name.toLowerCase() === ingredientName.toLowerCase(),
+    ),
+  }));
 
   return (
-    <Container className="py-4">
-      <div className="d-flex justify-content-between align-items-center">
-      <h1 className="mb-3">{recipe.name}</h1>
+    <main className="py-5">
+      <div className="container">
+        <div className="row align-items-start gy-4">
+          <div className="col-md-5 col-lg-4">
+            <div className="card shadow-sm border-0">
+              <div className="position-relative" style={{ height: 280 }}>
+                <Image
+                  src={recipe.image || '/images/placeholder.png'}
+                  alt={recipe.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 400px"
+                  className="object-fit-cover rounded-top"
+                />
+              </div>
+              <div className="card-body">
+                <h2 className="fw-bold fs-4 mb-2">{recipe.name}</h2>
+                <p className="text-muted mb-3">
+                  By {recipe.owner || 'Unknown chef'}
+                </p>
 
-      {/* ⭐ Favorite Button appears here */}
-        {userId && (
-          <FavoriteButton
-            recipeId={recipe.id}
-            userId={userId}
-            isFavorited={isFavorited}
-          />
-        )}
-      </div>
+                {canEdit && (
+                  <Link
+                    href={`/recipes/${recipe.id}/edit`}
+                    className="btn btn-outline-primary w-100 mb-3"
+                  >
+                    Edit recipe
+                  </Link>
+                )}
 
-      {recipe.image && (
-        <div className="mb-4" style={{ maxWidth: 600 }}>
-          <div className="position-relative" style={{ height: 350 }}>
-            <Image
-              src={recipe.image}
-              alt={recipe.name}
-              fill
-              className="object-fit-cover rounded-4 shadow-sm"
-            />
+                <h6 className="fw-semibold">Tags</h6>
+                <div className="mb-3">
+                  {tags.length === 0 ? (
+                    <span className="text-muted">No tags provided.</span>
+                  ) : (
+                    tags.map((tag) => (
+                      <span key={tag} className="badge bg-warning text-dark me-1 mb-1">
+                        {tag}
+                      </span>
+                    ))
+                  )}
+                </div>
+
+                <h6 className="fw-semibold">Dietary Restrictions</h6>
+                <div>
+                  {dietaryRestrictions.length === 0 ? (
+                    <span className="text-muted">None specified.</span>
+                  ) : (
+                    dietaryRestrictions.map((restriction) => (
+                      <span key={restriction} className="badge bg-success me-1 mb-1">
+                        {restriction}
+                      </span>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-7 col-lg-8">
+            <div className="card shadow-sm border-0 mb-4">
+              <div className="card-body">
+                <h3 className="fw-bold fs-5 mb-3">Ingredients</h3>
+                <ul className="list-group list-group-flush mb-1">
+                  {parsedIngredients.map((ingredient, index) => (
+                    <li key={`${ingredient}-${index}`} className="list-group-item ps-0">
+                      {ingredient}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="card shadow-sm border-0 mb-4">
+              <div className="card-body">
+                <h3 className="fw-bold fs-5 mb-3">Steps</h3>
+                <ol className="mb-0 ps-3">
+                  {parsedSteps.map((step, index) => (
+                    <li key={`step-${index}`} className="mb-2">
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+
+            <div className="card shadow-sm border-0">
+              <div className="card-body">
+                <h3 className="fw-bold fs-5 mb-3">Where to buy ingredients</h3>
+                {vendorByIngredient.every((item) => item.offers.length === 0) ? (
+                  <p className="text-muted mb-0">
+                    No vendor listings are available for these ingredients yet.
+                  </p>
+                ) : (
+                  <div className="d-flex flex-column gap-3">
+                    {vendorByIngredient.map((ingredient) => (
+                      <div key={ingredient.name}>
+                        <h6 className="fw-semibold mb-2">{ingredient.name}</h6>
+                        {ingredient.offers.length === 0 ? (
+                          <p className="text-muted mb-0">
+                            No vendors currently offer this ingredient.
+                          </p>
+                        ) : (
+                          <ul className="list-group">
+                            {ingredient.offers.map((offer) => (
+                              <li
+                                key={offer.id}
+                                className="list-group-item d-flex align-items-center justify-content-between"
+                              >
+                                <div>
+                                  <div className="fw-semibold">{offer.vendor?.name ?? 'Vendor'}</div>
+                                  {offer.vendor?.address ? (
+                                    <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+                                      {offer.vendor.address}
+                                    </div>
+                                  ) : null}
+                                  {offer.size ? (
+                                    <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+                                      Size: {offer.size}
+                                    </div>
+                                  ) : null}
+                                </div>
+                                <div className="fw-bold" style={{ color: '#ff6b35' }}>
+                                  ${offer.price.toFixed(2)}
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <Link href="/browse-recipes" className="text-decoration-none">&larr; Back to recipes</Link>
+            </div>
           </div>
         </div>
-      )}
-
-      {recipe.tags.length > 0 && (
-        <div className="mb-3 d-flex flex-wrap gap-2">
-          {recipe.tags.map((tag) => (
-            <Badge key={tag} bg="secondary">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-      )}
-
-      {recipe.dietaryRestrictions.length > 0 && (
-        <div className="mb-3 d-flex flex-wrap gap-2">
-          {recipe.dietaryRestrictions.map((d) => (
-            <Badge key={d} bg="success">
-              {d}
-            </Badge>
-          ))}
-        </div>
-      )}
-
-      <p className="text-muted mb-4">
-        By {recipe.owner} · Created on{' '}
-        {recipe.createdAt.toLocaleDateString()}
-      </p>
-
-      <h2>Ingredients</h2>
-      <p style={{ whiteSpace: 'pre-wrap' }}>{recipe.ingredients}</p>
-
-      <h2 className="mt-4">Steps</h2>
-      <p style={{ whiteSpace: 'pre-wrap' }}>{recipe.steps}</p>
-
-      <div className="mt-4 d-flex gap-2">
-        <Link href={`/recipes/${recipe.id}/edit`}>
-          <Button variant="primary">Edit Recipe</Button>
-        </Link>
-
-        <DeleteRecipeButton id={recipe.id} />
       </div>
-    </Container>
+    </main>
   );
 }

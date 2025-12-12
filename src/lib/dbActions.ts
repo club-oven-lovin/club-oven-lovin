@@ -243,3 +243,35 @@ export async function toggleFavorite(userId: number, recipeId: number) {
 
   return { favorited: true };
 }
+/**
+ * Updates vendor profile information.
+ */
+export async function updateVendorProfile(data: {
+  id: string;
+  name: string;
+  address: string;
+  hours: string;
+  owner: string; // needed for uniqueness check logic
+}) {
+  // Check if name is already taken by another vendor
+  const existing = await prisma.vendor.findFirst({
+    where: {
+      name: data.name,
+      id: { not: data.id }, // exclude self
+    },
+  });
+
+  if (existing) {
+    throw new Error('This vendor name is already taken.');
+  }
+
+  return prisma.vendor.update({
+    where: { id: data.id },
+    data: {
+      name: data.name,
+      address: data.address,
+      hours: data.hours,
+    },
+  });
+}
+
