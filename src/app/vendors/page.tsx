@@ -1,14 +1,14 @@
 import { getServerSession } from 'next-auth';
 import { Container } from 'react-bootstrap';
 import authOptions from '@/lib/authOptions';
-import { loggedInProtectedPage } from '@/lib/page-protection';
+import { vendorProtectedPage } from '@/lib/page-protection';
 import { prisma } from '@/lib/prisma';
 import Vendor from '@/components/Vendor';
 
 const VendorPage = async () => {
   const session = await getServerSession(authOptions);
 
-  loggedInProtectedPage(
+  vendorProtectedPage(
     session as {
       user: { email: string; id: string; randomKey: string };
     } | null,
