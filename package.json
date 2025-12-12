@@ -21,6 +21,7 @@
     "@mui/material": "^7.3.6",
     "@ngneat/falso": "^7.2.0",
     "@prisma/client": "^6.19.0",
+    "@vercel/blob": "^2.0.0",
     "bcrypt": "^5.1.1",
     "bootstrap": "^5.3.3",
     "multiselect-react-dropdown": "^2.0.25",
@@ -31,6 +32,8 @@
     "react-bootstrap-icons": "^1.11.4",
     "react-dom": "^18",
     "react-hook-form": "^7.52.0",
+    "sharp": "^0.34.5",
+    "sonner": "^2.0.7",
     "sweetalert": "^2.1.2",
     "ts-node": "10.9.2",
     "yup": "^1.4.0"

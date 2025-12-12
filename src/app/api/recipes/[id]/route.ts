@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import authOptions from '@/lib/authOptions';
+import { deleteImageByUrl } from '@/lib/blobActions';
 
 type SessionUser = {
   email?: string;
@@ -39,6 +40,11 @@ export async function PATCH(
 
     const body = await req.json();
     console.log('Updating recipe', recipeId, 'with body:', body);
+
+    // If image is being replaced, delete the old Blob image
+    if (body.image && body.image !== existing.image) {
+      await deleteImageByUrl(existing.image);
+    }
 
     const updatedRecipe = await prisma.recipe.update({
       where: { id: recipeId },
@@ -83,6 +89,16 @@ export async function DELETE(
       return new NextResponse('Invalid ID', { status: 400 });
     }
 
+    // Get the recipe to find the image URL
+    const recipe = await prisma.recipe.findUnique({
+      where: { id: recipeId },
+    });
+
+    if (recipe) {
+      // Delete the Blob image if it exists
+      await deleteImageByUrl(recipe.image);
+    }
+
     await prisma.recipe.delete({
       where: { id: recipeId },
     });
@@ -93,3 +109,4 @@ export async function DELETE(
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
+
