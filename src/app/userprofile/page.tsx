@@ -12,8 +12,7 @@ function addRatings<T extends { reviews?: { rating: number }[] }>(
     const reviews = recipe.reviews ?? [];
     const totalRating = reviews.reduce((sum, r) => sum + r.rating, 0);
     const averageRating = reviews.length > 0 ? totalRating / reviews.length : 0;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { reviews: _, ...recipeData } = recipe;
+    const { reviews: _reviews, ...recipeData } = recipe;
     return {
       ...recipeData,
       averageRating,
