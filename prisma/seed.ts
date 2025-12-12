@@ -83,6 +83,62 @@ async function main() {
       });
     }
   }
+
+  // Seed RECIPES
+  console.log('  Seeding recipes...');
+  const recipes = [
+    {
+      name: "Classic Margherita Pizza",
+      image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=800&q=80",
+      ingredients: "Dough, Tomato Sauce, Mozzarella, Basil",
+      steps: "1. Roll dough. 2. Add sauce and cheese. 3. Bake at 450F for 15 mins. 4. Garnish with basil.",
+      tags: ["Italian", "Dinner", "Vegetarian"],
+      dietaryRestrictions: ["Vegetarian"],
+      owner: "john@foo.com", // Assigned to proper user
+    },
+    {
+      name: "The Grinch",
+      image: "https://images.unsplash.com/photo-1541519227354-08fa5d50c75b?auto=format&fit=crop&w=800&q=80",
+      ingredients: "Green Eggs, Ham",
+      steps: "1. Dye eggs green. 2. Fry ham.",
+      tags: ["Holiday", "Breakfast"],
+      dietaryRestrictions: [],
+      owner: "john@foo.com",
+    },
+    {
+      name: "Avocado Toast with Egg",
+      image: "https://images.unsplash.com/photo-1541519227354-08fa5d50c75b?auto=format&fit=crop&w=800&q=80",
+      ingredients: "Bread, Avocado, Egg, Chili Flakes",
+      steps: "1. Toast bread. 2. Mash avocado. 3. Fry egg. 4. Assemble.",
+      tags: ["Breakfast", "Healthy", "Quick"],
+      dietaryRestrictions: ["Vegetarian"],
+      owner: "john@foo.com",
+    }
+  ];
+
+  for (const r of recipes) {
+    const user = await prisma.user.findUnique({ where: { email: r.owner } });
+    if (!user) continue;
+
+    // Use name as unique identifier for upsert, or just create if cleaning DB
+    // Since Recipe doesn't have unique name, allow duplicates or check first.
+    // For seeding, it's safer to findFirst.
+    const existing = await prisma.recipe.findFirst({ where: { name: r.name, owner: r.owner } });
+    if (!existing) {
+      console.log(`  Creating recipe: ${r.name}`);
+      await prisma.recipe.create({
+        data: {
+          name: r.name,
+          image: r.image,
+          ingredients: r.ingredients,
+          steps: r.steps,
+          tags: r.tags,
+          dietaryRestrictions: r.dietaryRestrictions,
+          owner: r.owner,
+        }
+      });
+    }
+  }
 }
 
 

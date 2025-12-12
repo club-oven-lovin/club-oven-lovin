@@ -15,7 +15,10 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^3.6.0",
+    "@mui/material": "^7.3.6",
     "@ngneat/falso": "^7.2.0",
     "@prisma/client": "^6.19.0",
     "bcrypt": "^5.1.1",

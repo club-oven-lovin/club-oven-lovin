@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 import { StarFill, Star } from 'react-bootstrap-icons';
+import { addReview } from '@/lib/reviewActions'; // Import the server action
 
 interface ReviewModalProps {
     recipeId: number;
@@ -25,11 +26,18 @@ export default function ReviewModal({ recipeId, recipeName }: ReviewModalProps) 
     };
     const handleShow = () => setShow(true);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    // ... inside component ...
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // In a real app, this would be a server action or API call
-        alert(`Review for "${recipeName}" submitted! (DB connection pending)`);
-        handleClose();
+        try {
+            await addReview(recipeId, reviewName, reviewRating, reviewText);
+            alert(`Review for "${recipeName}" submitted successfully!`);
+            handleClose();
+        } catch (error) {
+            console.error('Failed to submit review:', error);
+            alert('Failed to submit review. Please try again.');
+        }
     };
 
     return (

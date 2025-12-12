@@ -5,8 +5,9 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import authOptions from '@/lib/authOptions';
 import FavoriteButton from '@/components/FavoriteButton';
-
 import ReviewModal from '@/components/ReviewModal';
+import ReviewsList from '@/components/ReviewsList';
+import StarRating from '@/components/StarRating';
 
 const cleanIngredient = (ingredient: string) =>
   ingredient
@@ -27,24 +28,30 @@ const parseSteps = (steps: string) =>
 
 export default async function RecipeDetailPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
-  const currentUserEmail = session?.user?.email ?? null;
+  // Get role from session (assuming randomKey holds role as per analysis)
+  interface CustomUser {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    randomKey?: string;
+  }
+
+  const user = session?.user as CustomUser | undefined;
+  const currentUserEmail = user?.email ?? null;
+  const isAdmin = user?.randomKey === 'ADMIN';
+
   const recipeId = Number(params.id);
 
   if (Number.isNaN(recipeId)) {
     return notFound();
   }
 
-  interface SessionUserWithId {
-    id?: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  }
-
-  const userId = session?.user ? Number((session.user as SessionUserWithId).id) : null;
+  const userId = user?.id ? Number(user.id) : null;
 
   const recipe = await prisma.recipe.findUnique({
     where: { id: recipeId },
+    include: { reviews: { orderBy: { createdAt: 'desc' } } },
   });
 
   if (!recipe) {
@@ -52,6 +59,11 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
   }
 
   const canEdit = !!currentUserEmail && recipe.owner === currentUserEmail;
+
+  // Calculate Aggregates
+  const totalRating = recipe.reviews.reduce((sum, r) => sum + r.rating, 0);
+  const averageRating = recipe.reviews.length > 0 ? totalRating / recipe.reviews.length : 0;
+  const reviewCount = recipe.reviews.length;
 
   const parsedIngredients = parseIngredients(recipe.ingredients ?? '');
   const parsedSteps = parseSteps(recipe.steps ?? '');
@@ -110,7 +122,14 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
                 <p className="text-muted mb-3">
                   By {recipe.owner || 'Unknown chef'}
                 </p>
-              
+
+                {/* Star Rating Header */}
+                <div className="d-flex align-items-center gap-2 mb-3">
+                  <span className="fw-bold fs-5">{averageRating.toFixed(1)}</span>
+                  <StarRating rating={averageRating} size={20} />
+                  <span className="text-muted small">({reviewCount.toLocaleString()} reviews)</span>
+                </div>
+
                 {canEdit && (
                   <Link
                     href={`/recipes/${recipe.id}/edit`}
@@ -238,6 +257,18 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Reviews Section */}
+            <div className="card shadow-sm border-0 mt-4 mb-4">
+              <div className="card-body">
+                <h3 className="fw-bold fs-5 mb-3">Reviews</h3>
+                <ReviewsList
+                  reviews={recipe.reviews}
+                  currentUserEmail={currentUserEmail}
+                  isAdmin={isAdmin}
+                />
               </div>
             </div>
 
