@@ -3,6 +3,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import authOptions from '@/lib/authOptions';
 import { loggedInProtectedPage } from '@/lib/page-protection';
 import KitchenTipsCard from '@/components/KitchenTipsCard';
+import { prisma } from '@/lib/prisma';
 
 const actionButtons = [
   {
@@ -28,35 +29,11 @@ const actionButtons = [
   },
 ];
 
-const recommendedRecipes = [
-  {
-    title: 'Classic Margherita Pizza',
-    description: 'Fresh basil, creamy mozzarella, and charred crust for an easy crowd-pleaser.',
-    href: '/recipes/1',
-    accentStart: '#fff3ec',
-    accentEnd: '#ffd1b8',
-  },
-  {
-    title: 'Smoky Chipotle Tacos',
-    description: 'Bright lime slaw and chipotle peppers bring serious flavor to weeknight tacos.',
-    href: '/recipes/2',
-    accentStart: '#fff1ea',
-    accentEnd: '#ffc8a5',
-  },
-  {
-    title: 'Creamy Garlic Pasta',
-    description: 'Silky sauce in under 20 minutes when you crave comfort without the hassle.',
-    href: '/recipes/3',
-    accentStart: '#fff5ee',
-    accentEnd: '#ffd9c0',
-  },
-  {
-    title: 'Berry Oat Breakfast Bars',
-    description: 'Sweet-tart berries baked into chewy, grab-and-go breakfast squares.',
-    href: '/recipes/4',
-    accentStart: '#fff0e7',
-    accentEnd: '#ffcba6',
-  },
+const recommendationAccents = [
+  { accentStart: '#fff3ec', accentEnd: '#ffd1b8' },
+  { accentStart: '#fff1ea', accentEnd: '#ffc8a5' },
+  { accentStart: '#fff5ee', accentEnd: '#ffd9c0' },
+  { accentStart: '#fff0e7', accentEnd: '#ffcba6' },
 ];
 
 const kitchenTips = [
@@ -98,6 +75,41 @@ const UserHomePage = async () => {
 
   loggedInProtectedPage(session);
   const displayName = session?.user?.name ?? 'user';
+  const allRecipes = await prisma.recipe.findMany({
+    select: {
+      id: true,
+      name: true,
+      steps: true,
+      ingredients: true,
+      owner: true,
+    },
+  });
+
+  const shuffledRecipes = [...allRecipes];
+  for (let i = shuffledRecipes.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledRecipes[i], shuffledRecipes[j]] = [shuffledRecipes[j], shuffledRecipes[i]];
+  }
+
+  const selectedRecipes = shuffledRecipes.slice(0, 4);
+  const recommendedRecipes = selectedRecipes.map((recipe, index) => {
+    const descriptionSource = recipe.steps || recipe.ingredients || '';
+    const normalized = descriptionSource.replace(/\s+/g, ' ').trim();
+    const description =
+      normalized.length > 0
+        ? normalized.slice(0, 110).concat(normalized.length > 110 ? '…' : '')
+        : 'Jump in to see the steps, ingredients, and community notes.';
+    const { accentStart, accentEnd } = recommendationAccents[index % recommendationAccents.length];
+
+    return {
+      title: recipe.name,
+      description,
+      href: `/recipes/${recipe.id}`,
+      accentStart,
+      accentEnd,
+    };
+  });
+  const hasRecommendations = recommendedRecipes.length > 0;
 
   return (
     <main className="bg-body-tertiary min-vh-100">
@@ -187,33 +199,39 @@ const UserHomePage = async () => {
             </p>
           </div>
 
-          <Row className="g-4">
-            {recommendedRecipes.map(({ title, description, href, accentStart, accentEnd }) => (
-              <Col key={title} xs={12} md={6} lg={3}>
-                <div
-                  className="h-100 rounded-4 p-4 text-dark shadow-sm border-0 position-relative overflow-hidden"
-                  style={{
-                    background: `linear-gradient(135deg, ${accentStart}, ${accentEnd})`,
-                    boxShadow: '0 1.25rem 2rem rgba(255, 107, 53, 0.1)',
-                  }}
-                >
-                  <h3 className="h5 fw-semibold" style={{ color: charcoal }}>{title}</h3>
-                  <p className="mb-4" style={{ color: 'rgba(42, 42, 42, 0.7)' }}>
-                    {description}
-                  </p>
-                  <Button
-                    href={href}
-                    variant="light"
-                    size="sm"
-                    className="text-uppercase fw-semibold px-3"
-                    style={{ color: charcoal, borderColor: charcoal }}
+          {hasRecommendations ? (
+            <Row className="g-4">
+              {recommendedRecipes.map(({ title, description, href, accentStart, accentEnd }) => (
+                <Col key={title} xs={12} md={6} lg={3}>
+                  <div
+                    className="h-100 rounded-4 p-4 text-dark shadow-sm border-0 position-relative overflow-hidden"
+                    style={{
+                      background: `linear-gradient(135deg, ${accentStart}, ${accentEnd})`,
+                      boxShadow: '0 1.25rem 2rem rgba(255, 107, 53, 0.1)',
+                    }}
                   >
-                    View recipe
-                  </Button>
-                </div>
-              </Col>
-            ))}
-          </Row>
+                    <h3 className="h5 fw-semibold" style={{ color: charcoal }}>{title}</h3>
+                    <p className="mb-4" style={{ color: 'rgba(42, 42, 42, 0.7)' }}>
+                      {description}
+                    </p>
+                    <Button
+                      href={href}
+                      variant="light"
+                      size="sm"
+                      className="text-uppercase fw-semibold px-3"
+                      style={{ color: charcoal, borderColor: charcoal }}
+                    >
+                      View recipe
+                    </Button>
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            <p className="text-center text-muted mb-0">
+              Add your first recipe to start seeing personalized recommendations here.
+            </p>
+          )}
         </Container>
       </section>
 
