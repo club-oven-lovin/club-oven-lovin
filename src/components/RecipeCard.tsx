@@ -35,28 +35,27 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const href = `/recipes/${recipe.id}`;
 
   return (
-    <Link href={href} className="text-decoration-none text-reset">
-      <Card className="h-100 shadow-sm border-0">
-        {recipe.image && (
-          <div className="position-relative" style={{ height: 200 }}>
-            <Image
-              src={recipe.image}
-              alt={recipe.name}
-              fill
-              className="object-fit-cover rounded-top"
-            />
-          </div>
-        )}
+    <Card
+       as={Link}
+      href={`/recipes/${recipe.id}`}
+      className="h-100 shadow-sm border-0 recipe-card-custom text-decoration-none"
+      data-testid={`recipe-card-${recipe.id}`}
+    >
+      <div className="recipe-card-image-container">
+        <Image
+          src={recipe.image || '/images/placeholder.png'}
+          alt={recipe.name || 'Recipe'}
+          width={150}
+          height={150}
+          className="card-img-top recipe-card-image"
+          style={{ objectFit: 'cover' }}
+        />
+      </div>
 
-        <Card.Body>
-          <Card.Title className="d-flex justify-content-between align-items-start">
-            <span>{recipe.name}</span>
-            <span className="d-flex align-items-center gap-1">
-              {Array.from({ length: rating }).map((_, i) => (
-                <StarFill key={i} size={14} color={primaryOrange} />
-              ))}
-            </span>
-          </Card.Title>
+      <Card.Body className="d-flex flex-column">
+        <Card.Title className="fw-bold fs-6 mb-1" style={{ color: '#343a40' }}>
+          {recipe.name}
+        </Card.Title>
 
           {time !== 'N/A' && (
             <Card.Subtitle className="mb-2 text-muted">
