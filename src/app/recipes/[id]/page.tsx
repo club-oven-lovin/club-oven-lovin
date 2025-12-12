@@ -28,9 +28,18 @@ const parseSteps = (steps: string) =>
 
 export default async function RecipeDetailPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
-  const currentUserEmail = session?.user?.email ?? null;
   // Get role from session (assuming randomKey holds role as per analysis)
-  const isAdmin = session?.user?.randomKey === 'ADMIN';
+  interface CustomUser {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    randomKey?: string;
+  }
+
+  const user = session?.user as CustomUser | undefined;
+  const currentUserEmail = user?.email ?? null;
+  const isAdmin = user?.randomKey === 'ADMIN';
 
   const recipeId = Number(params.id);
 
@@ -38,14 +47,7 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
     return notFound();
   }
 
-  interface SessionUserWithId {
-    id?: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  }
-
-  const userId = session?.user ? Number((session.user as SessionUserWithId).id) : null;
+  const userId = user?.id ? Number(user.id) : null;
 
   const recipe = await prisma.recipe.findUnique({
     where: { id: recipeId },

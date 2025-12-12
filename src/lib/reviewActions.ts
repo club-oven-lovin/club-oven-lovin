@@ -49,8 +49,15 @@ export async function deleteReview(reviewId: number) {
             return { success: false, error: 'Review not found' };
         }
 
-        const isAdmin = session.user.randomKey === 'ADMIN';
-        const isOwner = session.user.email === review.owner;
+        interface CustomUser {
+            randomKey?: string;
+            email?: string | null;
+            name?: string | null;
+        }
+        const user = session.user as CustomUser;
+
+        const isAdmin = user.randomKey === 'ADMIN';
+        const isOwner = user.email === review.owner;
 
         if (!isAdmin && !isOwner) {
             return { success: false, error: 'Forbidden' };
@@ -71,7 +78,13 @@ export async function deleteReview(reviewId: number) {
 export async function deleteReviewsBulk(reviewIds: number[]) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || session.user?.randomKey !== 'ADMIN') {
+        interface CustomUser {
+            randomKey?: string;
+            email?: string | null;
+        }
+        const user = session?.user as CustomUser | undefined;
+
+        if (!session || user?.randomKey !== 'ADMIN') {
             return { success: false, error: 'Unauthorized: Admin only' };
         }
 
