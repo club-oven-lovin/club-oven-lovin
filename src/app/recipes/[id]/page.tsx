@@ -5,6 +5,8 @@ import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import authOptions from '@/lib/authOptions';
 
+import ReviewModal from '@/components/ReviewModal';
+
 const cleanIngredient = (ingredient: string) =>
   ingredient
     .replace(/^[-•\d\.\)\s]+/, '')
@@ -50,17 +52,17 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
 
   const vendorIngredients = parsedIngredients.length
     ? await prisma.ingredient.findMany({
-        where: {
-          available: true,
-          OR: parsedIngredients.map((name) => ({
-            name: {
-              equals: name,
-              mode: 'insensitive',
-            },
-          })),
-        },
-        include: { vendor: true },
-      })
+      where: {
+        available: true,
+        OR: parsedIngredients.map((name) => ({
+          name: {
+            equals: name,
+            mode: 'insensitive',
+          },
+        })),
+      },
+      include: { vendor: true },
+    })
     : [];
 
   const vendorByIngredient = parsedIngredients.map((ingredientName) => ({
@@ -126,6 +128,10 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
                   )}
                 </div>
               </div>
+            </div>
+            {/* Review Button positioned per request */}
+            <div className="mt-4">
+              <ReviewModal recipeId={recipe.id} recipeName={recipe.name} />
             </div>
           </div>
 

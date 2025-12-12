@@ -10,9 +10,9 @@ export interface Recipe {
   dietaryRestrictions: string[];
   owner: string;
   createdAt: Date;
-  rating: number;     // Changed from optional to required for mock data
-  time: string;       // Changed from optional to required for mock data
-  price: string;      // Restored price field
+  rating?: number;     // Changed from optional to required for mock data
+  time?: string;       // Changed from optional to required for mock data
+  price?: string;      // Restored price field
 }
 
 export const marketingRecipes: Recipe[] = [
