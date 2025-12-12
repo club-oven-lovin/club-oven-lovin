@@ -215,6 +215,34 @@ export async function changePassword(credentials: { email: string; password: str
   });
 }
 
+export async function addFavorite(userId: number, recipeId: number) {
+  return prisma.favorite.create({
+    data: { userId, recipeId },
+  });
+}
+
+export async function removeFavorite(userId: number, recipeId: number) {
+  return prisma.favorite.deleteMany({
+    where: { userId, recipeId },
+  });
+}
+
+export async function toggleFavorite(userId: number, recipeId: number) {
+  const existing = await prisma.favorite.findFirst({
+    where: { userId, recipeId },
+  });
+
+  if (existing) {
+    await prisma.favorite.delete({ where: { id: existing.id } });
+    return { favorited: false };
+  }
+
+  await prisma.favorite.create({
+    data: { userId, recipeId },
+  });
+
+  return { favorited: true };
+}
 /**
  * Updates vendor profile information.
  */

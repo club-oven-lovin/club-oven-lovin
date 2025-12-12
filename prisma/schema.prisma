@@ -12,10 +12,17 @@ model User {
   email               String     @unique
   password            String
   role                Role       @default(USER)
-  dietaryRestrictions String[]   @default([])
-  image               String?
   name                String?
-  Favorite            Favorite[]
+  image               String?
+  dietaryRestrictions String[]   @default([])
+  favorites           Favorite[]
+}
+
+enum Condition {
+  excellent
+  good
+  fair
+  poor
 }
 
 model Stuff {
@@ -77,12 +84,13 @@ model PageVisit {
   createdAt DateTime @default(now())
 }
 
+// Adding Favorite model to link Users and Recipes
 model Favorite {
   id       Int    @id @default(autoincrement())
   userId   Int
   recipeId Int
-  Recipe   Recipe @relation(fields: [recipeId], references: [id])
-  User     User   @relation(fields: [userId], references: [id])
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
 
   @@unique([userId, recipeId])
 }
@@ -91,11 +99,4 @@ enum Role {
   USER
   ADMIN
   VENDOR
-}
-
-enum Condition {
-  excellent
-  good
-  fair
-  poor
 }

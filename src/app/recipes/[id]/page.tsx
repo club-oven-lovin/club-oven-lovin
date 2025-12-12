@@ -4,10 +4,10 @@ import { notFound } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import authOptions from '@/lib/authOptions';
+import FavoriteButton from '@/components/FavoriteButton';
 import ReviewModal from '@/components/ReviewModal';
 import ReviewsList from '@/components/ReviewsList';
 import StarRating from '@/components/StarRating';
-import { StarFill, Star } from 'react-bootstrap-icons';
 
 const cleanIngredient = (ingredient: string) =>
   ingredient
@@ -37,6 +37,15 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
   if (Number.isNaN(recipeId)) {
     return notFound();
   }
+
+  interface SessionUserWithId {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  }
+
+  const userId = session?.user ? Number((session.user as SessionUserWithId).id) : null;
 
   const recipe = await prisma.recipe.findUnique({
     where: { id: recipeId },
@@ -83,6 +92,14 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
     ),
   }));
 
+  let isFavorited = false;
+  if (userId) {
+    const favorite = await prisma.favorite.findFirst({
+      where: { userId, recipeId },
+    });
+    isFavorited = Boolean(favorite);
+  }
+
   return (
     <main className="py-5">
       <div className="container">
@@ -118,6 +135,17 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
                   >
                     Edit recipe
                   </Link>
+                )}
+
+                {userId && (
+                  <div className="d-flex justify-content-center mb-3">
+                    <FavoriteButton
+                      recipeId={recipe.id}
+                      userId={userId}
+                      isFavorited={isFavorited}
+                      className="w-100"
+                    />
+                  </div>
                 )}
 
                 <h6 className="fw-semibold">Tags</h6>
