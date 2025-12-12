@@ -20,6 +20,7 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  VENDOR
 }
 
 model User {
@@ -81,4 +82,10 @@ model Recipe {
   dietaryRestrictions String[] 
   owner               String
   createdAt           DateTime @default(now())
+}
+
+model PageVisit {
+  id        Int      @id @default(autoincrement())
+  path      String
+  createdAt DateTime @default(now())
 }

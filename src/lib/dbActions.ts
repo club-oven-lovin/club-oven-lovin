@@ -1,9 +1,46 @@
 'use server';
 
-import { Stuff, Condition } from '@prisma/client';
+import { Stuff, Condition, Role } from '@prisma/client';
 import { hash } from 'bcrypt';
 import { redirect } from 'next/navigation';
 import { prisma } from './prisma';
+
+/**
+ * Updates a user's role (Admin only).
+ * @param userId - The ID of the user to update
+ * @param role - The new role (USER, VENDOR, or ADMIN)
+ */
+export async function updateUserRole(userId: number, role: Role) {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { role },
+  });
+}
+
+/**
+ * Deletes a user from the database (Admin only).
+ * @param userId - The ID of the user to delete
+ */
+export async function deleteUser(userId: number) {
+  await prisma.user.delete({
+    where: { id: userId },
+  });
+}
+
+/**
+ * Deletes a vendor from the database (Admin only).
+ * @param vendorId - The ID of the vendor to delete
+ */
+export async function deleteVendor(vendorId: string) {
+  // First delete all ingredients associated with this vendor
+  await prisma.ingredient.deleteMany({
+    where: { vendorId },
+  });
+  // Then delete the vendor
+  await prisma.vendor.delete({
+    where: { id: vendorId },
+  });
+}
 
 /**
  * Adds a new stuff to the database.
@@ -29,6 +66,22 @@ export async function addStuff(stuff: { name: string; quantity: number; owner: s
   });
   // After adding, redirect to the list page
   redirect('/list');
+}
+
+/**
+ * Add ingredient to vendor list.
+ */
+export async function addIngredient(data: {
+  owner: string;
+  vendorId: string;
+  name: string;
+  price: number;
+  size: string;
+  available: boolean;
+}) {
+  return prisma.ingredient.create({
+    data,
+  });
 }
 
 /**
@@ -75,6 +128,27 @@ export async function editStuff(stuff: Stuff) {
   });
   // After updating, redirect to the list page
   redirect('/list');
+}
+
+/**
+ * Edits ingredients on vendor page.
+ */
+export async function updateIngredient(data: {
+  id: string;
+  name: string;
+  price: number;
+  size: string;
+  available: boolean;
+}) {
+  await prisma.ingredient.update({
+    where: { id: data.id },
+    data: {
+      name: data.name,
+      price: data.price,
+      size: data.size,
+      available: data.available,
+    },
+  });
 }
 
 /**
@@ -140,3 +214,36 @@ export async function changePassword(credentials: { email: string; password: str
     },
   });
 }
+
+/**
+ * Updates vendor profile information.
+ */
+export async function updateVendorProfile(data: {
+  id: string;
+  name: string;
+  address: string;
+  hours: string;
+  owner: string; // needed for uniqueness check logic
+}) {
+  // Check if name is already taken by another vendor
+  const existing = await prisma.vendor.findFirst({
+    where: {
+      name: data.name,
+      id: { not: data.id }, // exclude self
+    },
+  });
+
+  if (existing) {
+    throw new Error('This vendor name is already taken.');
+  }
+
+  return prisma.vendor.update({
+    where: { id: data.id },
+    data: {
+      name: data.name,
+      address: data.address,
+      hours: data.hours,
+    },
+  });
+}
+

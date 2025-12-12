@@ -1,10 +1,8 @@
-// src/components/RecipeCard.tsx
-
 'use client';
 
 import Image from 'next/image';
-import { Card, Badge } from 'react-bootstrap';
-import { StarFill } from 'react-bootstrap-icons';
+import Link from 'next/link';
+import { Badge, Card } from 'react-bootstrap';
 import type { Recipe as MarketingRecipe } from '@/lib/recipeData';
 import type { Recipe as PrismaRecipe } from '@prisma/client';
 
@@ -14,8 +12,10 @@ interface RecipeCardProps {
   recipe: RecipeCardRecipe;
 }
 
-const hasMarketingFields = (recipe: RecipeCardRecipe): recipe is MarketingRecipe =>
-  'rating' in recipe && 'time' in recipe && 'price' in recipe;
+const hasMarketingFields = (
+  recipe: RecipeCardRecipe
+): recipe is MarketingRecipe =>
+  'rating' in recipe && 'time' in recipe;
 
 const hasDietaryData = (recipe: RecipeCardRecipe): recipe is PrismaRecipe =>
   'tags' in recipe && 'dietaryRestrictions' in recipe;
@@ -23,15 +23,19 @@ const hasDietaryData = (recipe: RecipeCardRecipe): recipe is PrismaRecipe =>
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const primaryOrange = '#ff6b35';
 
-  const rating = hasMarketingFields(recipe) ? recipe.rating : 5;
-  const time = hasMarketingFields(recipe) ? recipe.time : 'N/A';
-  const price = hasMarketingFields(recipe) ? recipe.price : 'USD 0.00';
+  const time = hasMarketingFields(recipe) ? recipe.time ?? 'N/A' : 'N/A';
   const tags = hasDietaryData(recipe) ? recipe.tags : [];
-  const dietaryRestrictions = hasDietaryData(recipe) ? recipe.dietaryRestrictions : [];
+  const dietaryRestrictions = hasDietaryData(recipe)
+    ? recipe.dietaryRestrictions
+    : [];
+
+  const href = `/recipes/${recipe.id}`;
 
   return (
     <Card
-      className="shadow-sm border-0 recipe-card-custom"
+      as={Link}
+      href={href}
+      className="h-100 shadow-sm border-0 recipe-card-custom text-decoration-none"
       data-testid={`recipe-card-${recipe.id}`}
     >
       <div className="recipe-card-image-container">
@@ -45,53 +49,47 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
         />
       </div>
 
-      <Card.Body>
+      <Card.Body className="d-flex flex-column">
         <Card.Title className="fw-bold fs-6 mb-1" style={{ color: '#343a40' }}>
           {recipe.name}
         </Card.Title>
 
-        {/* Rating / Time */}
-        <div className="d-flex align-items-center mb-3">
-          {Array.from({ length: rating }).map((_, i) => (
-            <StarFill key={i} size={14} className="me-1" style={{ color: primaryOrange }} />
-          ))}
-          <span className="text-muted ms-auto" style={{ fontSize: '0.9em' }}>
-            {time}
-          </span>
-        </div>
+        {time !== 'N/A' && (
+          <Card.Subtitle className="mb-2 text-muted">{time}</Card.Subtitle>
+        )}
 
-        {/* Tags */}
         {tags.length > 0 && (
-          <div className="mb-1">
+          <div className="mb-2 d-flex flex-wrap gap-1">
             {tags.map((tag) => (
-              <Badge key={tag} bg="warning" className="me-1 text-dark">
+              <Badge key={tag} bg="light" text="dark">
                 {tag}
               </Badge>
             ))}
           </div>
         )}
 
-        {/* Dietary Restrictions */}
         {dietaryRestrictions.length > 0 && (
-          <div className="mb-1">
+          <div className="d-flex flex-wrap gap-1">
             {dietaryRestrictions.map((d) => (
-              <Badge key={d} bg="success" className="me-1">
+              <Badge
+                key={d}
+                bg="light"
+                text="dark"
+                style={{
+                  border: `1px solid ${primaryOrange}`,
+                  color: primaryOrange,
+                }}
+              >
                 {d}
               </Badge>
             ))}
           </div>
         )}
-
-        {/* Price */}
-        <Card.Text className="fw-bold" style={{ color: primaryOrange }}>
-          {price}
-        </Card.Text>
-
-        {/* Display owner, useful for debugging or user-specific views */}
-        <Card.Text className="text-muted mt-auto" style={{ fontSize: '0.8em' }}>
-          By: {recipe.owner}
-        </Card.Text>
       </Card.Body>
+
+      <Card.Footer className="bg-white border-0 small text-muted">
+        By: {recipe.owner}
+      </Card.Footer>
     </Card>
   );
 };

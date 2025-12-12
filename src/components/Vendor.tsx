@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { Table, Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
 import { CheckCircleFill, XCircleFill, PencilSquare, PlusCircle } from 'react-bootstrap-icons';
-
+import { addIngredient, updateIngredient } from '@/lib/dbActions';
+import EditVendorProfileForm from './EditVendorProfileForm';
 import type { Ingredient, Vendor as VendorType } from '@prisma/client';
 
 export default function Vendor({
@@ -14,6 +15,61 @@ export default function Vendor({
   ingredients: Ingredient[];
 }) {
   const [ingredients, setIngredients] = useState(initialIngredients);
+  const [vendorData, setVendorData] = useState(vendor);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+  // Track the row being edited
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [editForm, setEditForm] = useState({
+    id: '',
+    name: '',
+    price: '',
+    size: '',
+    available: true,
+  });
+
+  const startEditing = (ingredient: Ingredient) => {
+    setEditingId(ingredient.id);
+    setEditForm({
+      id: ingredient.id,
+      name: ingredient.name,
+      price: ingredient.price.toString(),
+      size: ingredient.size,
+      available: ingredient.available,
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+  };
+
+  const saveChanges = async () => {
+    await updateIngredient({
+      id: editForm.id,
+      name: editForm.name,
+      price: parseFloat(editForm.price),
+      size: editForm.size,
+      available: editForm.available,
+    });
+
+    // update UI instantly
+    setIngredients((prev) =>
+      prev.map((i) =>
+        i.id === editForm.id
+          ? {
+            ...i,
+            name: editForm.name,
+            price: parseFloat(editForm.price),
+            size: editForm.size,
+            available: editForm.available,
+          }
+          : i
+      )
+    );
+
+    setEditingId(null);
+  };
 
   const [newIngredient, setNewIngredient] = useState({
     name: '',
@@ -22,21 +78,24 @@ export default function Vendor({
     available: true,
   });
 
-  const handleAddIngredient = () => {
+  const handleAddIngredient = async () => {
     if (!newIngredient.name || !newIngredient.price) return;
+    if (!vendor) return;
 
-    const ingredientToAdd = {
-      id: crypto.randomUUID(),
-      owner: vendor?.owner ?? '',
-      vendorId: vendor?.id ?? null,
+    // 1. Save to the database
+    const created = await addIngredient({
+      owner: vendor.owner,
+      vendorId: vendor.id,
       name: newIngredient.name,
       price: parseFloat(newIngredient.price),
       size: newIngredient.size,
       available: newIngredient.available,
-    };
+    });
 
-    setIngredients([...ingredients, ingredientToAdd]);
+    // 2. Update UI using the returned DB item
+    setIngredients([...ingredients, created]);
 
+    // 3. Reset input fields
     setNewIngredient({
       name: '',
       price: '',
@@ -49,20 +108,41 @@ export default function Vendor({
     <Container className="py-4">
 
       {/* Greeting card */}
-      <Card
-        className="vendor-homepage-greeting-card mb-4 shadow-sm"
-        data-testid="vendor-greeting-card"
-      >
-        <Card.Body className="text-center">
-          <Card.Title className="fs-2">
-            Welcome, {vendor?.name || 'Vendor'}
-          </Card.Title>
-          <Card.Text>
-            Location: <strong>{vendor?.address || 'N/A'}</strong><br />
-            Hours: {vendor?.hours || 'N/A'}
-          </Card.Text>
-        </Card.Body>
-      </Card>
+      {/* Greeting card */}
+      {isEditingProfile && vendorData ? (
+        <Card className="vendor-homepage-greeting-card mb-4 shadow-sm">
+          <Card.Body>
+            <EditVendorProfileForm
+              vendor={vendorData}
+              onCancel={() => setIsEditingProfile(false)}
+              onSuccess={(updated) => {
+                setVendorData(updated);
+                setIsEditingProfile(false);
+              }}
+            />
+          </Card.Body>
+        </Card>
+      ) : (
+        <Card
+          className="vendor-homepage-greeting-card mb-4 shadow-sm"
+          data-testid="vendor-greeting-card"
+        >
+          <Card.Body className="text-center position-relative">
+            <Button
+              variant="link"
+              className="position-absolute top-0 end-0 m-2 text-decoration-none"
+              onClick={() => setIsEditingProfile(true)}
+            >
+              <PencilSquare size={20} />
+            </Button>
+            <Card.Title className="fs-2">Welcome, {vendorData?.name || 'Vendor'}</Card.Title>
+            <Card.Text>
+              Location: <strong>{vendorData?.address || 'N/A'}</strong><br />
+              Hours: {vendorData?.hours || 'N/A'}
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      )}
 
       {/* Ingredients table */}
       <Table
@@ -82,26 +162,81 @@ export default function Vendor({
           </tr>
         </thead>
         <tbody>
-          {ingredients.map((item) => (
-            <tr key={item.id}>
-              <td>{item.name}</td>
-              <td>${item.price.toFixed(2)}</td>
-              <td>{item.size}</td>
-              <td className="text-center">
-                {item.available ? (
-                  <CheckCircleFill className="text-success" />
-                ) : (
-                  <XCircleFill className="text-danger" />
-                )}
-              </td>
-              <td className="text-center">
-                <Button className="vendor-homepage-orange-btn"
-                 size="sm">
-                  <PencilSquare />
-                </Button>
-              </td>
-            </tr>
-          ))}
+          {ingredients.map((item) =>
+            editingId === item.id ? (
+              // Editable Row
+              <tr key={item.id}>
+                <td>
+                  <Form.Control
+                    value={editForm.name}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, name: e.target.value })
+                    }
+                  />
+                </td>
+
+                <td>
+                  <Form.Control
+                    value={editForm.price}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, price: e.target.value })
+                    }
+                  />
+                </td>
+
+                <td>
+                  <Form.Control
+                    value={editForm.size}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, size: e.target.value })
+                    }
+                  />
+                </td>
+
+                <td className="text-center">
+                  <Form.Check
+                    type="checkbox"
+                    checked={editForm.available}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, available: e.target.checked })
+                    }
+                  />
+                </td>
+
+                <td>
+                  <Button size="sm" variant="success" onClick={saveChanges}>
+                    Save
+                  </Button>{' '}
+                  <Button size="sm" variant="secondary" onClick={cancelEditing}>
+                    Cancel
+                  </Button>
+                </td>
+              </tr>
+            ) : (
+              // Normal display row
+              <tr key={item.id}>
+                <td>{item.name}</td>
+                <td>${item.price.toFixed(2)}</td>
+                <td>{item.size}</td>
+                <td className="text-center">
+                  {item.available ? (
+                    <CheckCircleFill className="text-success" />
+                  ) : (
+                    <XCircleFill className="text-danger" />
+                  )}
+                </td>
+                <td className="text-center">
+                  <Button
+                    className="vendor-homepage-orange-btn"
+                    size="sm"
+                    onClick={() => startEditing(item)}
+                  >
+                    <PencilSquare />
+                  </Button>
+                </td>
+              </tr>
+            )
+          )}
         </tbody>
       </Table>
 
@@ -119,6 +254,7 @@ export default function Vendor({
                 }
               />
             </Col>
+
             <Col md>
               <Form.Control
                 placeholder="Price"
@@ -128,6 +264,7 @@ export default function Vendor({
                 }
               />
             </Col>
+
             <Col md>
               <Form.Control
                 placeholder="Size"
@@ -137,6 +274,7 @@ export default function Vendor({
                 }
               />
             </Col>
+
             <Col md>
               <Form.Select
                 value={newIngredient.available ? 'true' : 'false'}
@@ -151,6 +289,7 @@ export default function Vendor({
                 <option value="false">Not Available</option>
               </Form.Select>
             </Col>
+
             <Col md="auto">
               <Button className="vendor-homepage-orange-btn" onClick={handleAddIngredient}>
                 <PlusCircle /> Add

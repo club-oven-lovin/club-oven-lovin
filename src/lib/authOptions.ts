@@ -1,8 +1,10 @@
 /* eslint-disable arrow-body-style */
-import { compare } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { type NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { Role } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import config from '../../config/settings.development.json';
 
 const authOptions: NextAuthOptions = {
   session: {
@@ -34,6 +36,31 @@ const authOptions: NextAuthOptions = {
           });
 
           if (!user) {
+            const defaultAccount = config.defaultAccounts?.find(
+              (account) => account.email === credentials.email,
+            );
+
+            if (
+              defaultAccount &&
+              credentials.password === defaultAccount.password
+            ) {
+              console.log(`[AUTH] Seeding missing default account: ${credentials.email}`);
+              const hashedPassword = await hash(defaultAccount.password, 10);
+              const newUser = await prisma.user.create({
+                data: {
+                  email: defaultAccount.email,
+                  password: hashedPassword,
+                  role: (defaultAccount.role as Role) || Role.USER,
+                },
+              });
+
+              return {
+                id: `${newUser.id}`,
+                email: newUser.email,
+                randomKey: newUser.role,
+              };
+            }
+
             console.error('[AUTH] User not found:', credentials.email);
             return null;
           }
