@@ -32,6 +32,8 @@ model User {
   name                String?   // optional, safe for existing users
   image               String?   // optional
   dietaryRestrictions String[] @default([])  // empty array for existing users
+
+  favorites           Favorite[]
 }
 
 enum Condition {
@@ -82,10 +84,22 @@ model Recipe {
   dietaryRestrictions String[] 
   owner               String
   createdAt           DateTime @default(now())
+
+  favorites           Favorite[]
 }
 
 model PageVisit {
   id        Int      @id @default(autoincrement())
   path      String
   createdAt DateTime @default(now())
+}
+
+// Adding Favorite model to link Users and Recipes
+model Favorite {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  recipeId Int
+  user     User   @relation(fields: [userId], references: [id])
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  @@unique([userId, recipeId])
 }
