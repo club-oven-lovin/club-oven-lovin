@@ -10,30 +10,30 @@ const actionButtons = [
     label: 'Search Recipes',
     href: '/recipes/search',
     description: 'Dial in on cuisines, ingredients, and dietary filters instantly.',
-    accentStart: '#fff3ec',
-    accentEnd: '#ffd1b8',
+    accentStart: '#fffdfa',
+    accentEnd: '#f4efe7',
   },
   {
     label: 'Add New Recipe',
     href: "/add-recipe",
     description: 'Document your latest win with smart fields and auto-tagging.',
-    accentStart: '#fff1ea',
-    accentEnd: '#ffc8a5',
+    accentStart: '#fff9f2',
+    accentEnd: '#f2ece3',
   },
   {
     label: 'My Saved Recipes',
     href: '/userprofile',
     description: 'Jump back into your curated list whenever inspiration hits.',
-    accentStart: '#fff5ee',
-    accentEnd: '#ffd9c0',
+    accentStart: '#fff8f0',
+    accentEnd: '#f1ebe2',
   },
 ];
 
 const recommendationAccents = [
-  { accentStart: '#fff3ec', accentEnd: '#ffd1b8' },
-  { accentStart: '#fff1ea', accentEnd: '#ffc8a5' },
-  { accentStart: '#fff5ee', accentEnd: '#ffd9c0' },
-  { accentStart: '#fff0e7', accentEnd: '#ffcba6' },
+  { accentStart: '#fffdfa', accentEnd: '#f4efe7' },
+  { accentStart: '#fff9f2', accentEnd: '#f2ece3' },
+  { accentStart: '#fff8f0', accentEnd: '#f1ebe2' },
+  { accentStart: '#fff7ee', accentEnd: '#efe9e0' },
 ];
 
 const kitchenTips = [
