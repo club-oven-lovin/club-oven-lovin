@@ -5,6 +5,8 @@ import { Container, Badge, Button } from 'react-bootstrap';
 import Image from 'next/image';
 import Link from 'next/link';
 import DeleteRecipeButton from '@/components/DeleteRecipeButton';
+import { getServerSession } from 'next-auth';
+import authOptions from '@/lib/authOptions';
 
 interface RecipePageProps {
   params: { id: string };
@@ -23,6 +25,16 @@ export default async function RecipePage({ params }: RecipePageProps) {
   if (!recipe) {
     notFound();
   }
+
+  // 🔐 Auth + permissions
+  const session = await getServerSession(authOptions);
+  const user = session?.user as {
+    email?: string;
+    randomKey?: string;
+  } | undefined;
+
+  const canEdit = !!user?.email && user.email === recipe.owner;
+  const canDelete = user?.randomKey === 'ADMIN';
 
   return (
     <Container className="py-4">
@@ -73,11 +85,13 @@ export default async function RecipePage({ params }: RecipePageProps) {
       <p style={{ whiteSpace: 'pre-wrap' }}>{recipe.steps}</p>
 
       <div className="mt-4 d-flex gap-2">
-        <Link href={`/recipes/${recipe.id}/edit`}>
-          <Button variant="primary">Edit Recipe</Button>
-        </Link>
+        {canEdit && (
+          <Link href={`/recipes/${recipe.id}/edit`}>
+            <Button variant="primary">Edit Recipe</Button>
+          </Link>
+        )}
 
-        <DeleteRecipeButton id={recipe.id} />
+        {canDelete && <DeleteRecipeButton id={recipe.id} />}
       </div>
     </Container>
   );
