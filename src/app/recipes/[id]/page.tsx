@@ -9,6 +9,88 @@ import ReviewModal from '@/components/ReviewModal';
 import ReviewsList from '@/components/ReviewsList';
 import StarRating from '@/components/StarRating';
 
+const measurementWords = new Set([
+  'cup',
+  'cups',
+  'tbsp',
+  'tablespoon',
+  'tablespoons',
+  'tsp',
+  'teaspoon',
+  'teaspoons',
+  'oz',
+  'ounce',
+  'ounces',
+  'pound',
+  'pounds',
+  'lb',
+  'lbs',
+  'gram',
+  'grams',
+  'kg',
+  'kilogram',
+  'kilograms',
+  'ml',
+  'milliliter',
+  'milliliters',
+  'liter',
+  'liters',
+  'pinch',
+  'dash',
+  'clove',
+  'cloves',
+  'slice',
+  'slices',
+  'can',
+  'cans',
+  'package',
+  'packages',
+  'bunch',
+  'bunches',
+  'stick',
+  'sticks',
+]);
+
+const descriptorWords = new Set([
+  'fresh',
+  'large',
+  'small',
+  'medium',
+  'diced',
+  'chopped',
+  'minced',
+  'grated',
+  'shredded',
+  'optional',
+  'ripe',
+  'peeled',
+  'sliced',
+  'boneless',
+  'skinless',
+  'ground',
+  'softened',
+  'room',
+  'temperature',
+  'warm',
+  'hot',
+  'cold',
+  'cooked',
+  'raw',
+  'crushed',
+  'toasted',
+  'whole',
+  'halved',
+  'divided',
+  'plus',
+  'each',
+  'or',
+  'and',
+  'of',
+  'with',
+  'to',
+  'for',
+]);
+
 const cleanIngredient = (ingredient: string) =>
   ingredient
     .replace(/^[-•]\s*/, '')
@@ -19,6 +101,67 @@ const parseIngredients = (ingredients: string) =>
     .split(/\r?\n|,/)
     .map((item) => cleanIngredient(item))
     .filter((item) => item.length > 0);
+
+const normalizeIngredientName = (ingredient: string) =>
+  ingredient
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/[\d]+(?:\/[\d]+)?/g, ' ')
+    .replace(/[.,-]/g, ' ')
+    .split(/\s+/)
+    .filter((word) => word && !measurementWords.has(word) && !descriptorWords.has(word))
+    .join(' ')
+    .trim();
+
+const buildIngredientMetadata = (ingredient: string) => {
+  const normalizedName = normalizeIngredientName(ingredient);
+  const tokens = new Set<string>();
+
+  if (normalizedName) {
+    tokens.add(normalizedName);
+    normalizedName.split(/\s+/).forEach((token) => {
+      if (token.length > 2) {
+        tokens.add(token);
+      }
+    });
+  }
+
+  if (!tokens.size) {
+    const fallback = ingredient.toLowerCase();
+    if (fallback) {
+      tokens.add(fallback);
+    }
+  }
+
+  return {
+    displayName: ingredient,
+    normalizedName,
+    searchTokens: Array.from(tokens),
+  };
+};
+
+const matchesVendorIngredient = (
+  searchTokens: string[],
+  vendorNormalizedName: string,
+  vendorOriginalName: string,
+) => {
+  const vendorLower = vendorOriginalName.toLowerCase();
+
+  return searchTokens.some((token) => {
+    if (!token) return false;
+    if (vendorNormalizedName) {
+      if (
+        vendorNormalizedName.includes(token) ||
+        token.includes(vendorNormalizedName)
+      ) {
+        return true;
+      }
+    }
+
+    if (!vendorLower) return false;
+    return vendorLower.includes(token) || token.includes(vendorLower);
+  });
+};
 
 const parseSteps = (steps: string) =>
   steps
@@ -66,19 +209,25 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
   const reviewCount = recipe.reviews.length;
 
   const parsedIngredients = parseIngredients(recipe.ingredients ?? '');
+  const ingredientMetadata = parsedIngredients.map((ingredient) => buildIngredientMetadata(ingredient));
   const parsedSteps = parseSteps(recipe.steps ?? '');
   const tags = Array.isArray(recipe.tags) ? recipe.tags : [];
   const dietaryRestrictions = Array.isArray(recipe.dietaryRestrictions)
     ? recipe.dietaryRestrictions
     : [];
+  const searchTerms = Array.from(
+    new Set(
+      ingredientMetadata.flatMap((ingredient) => ingredient.searchTokens),
+    ),
+  ).filter((term) => term.length > 0);
 
-  const vendorIngredients = parsedIngredients.length
+  const vendorIngredientResults = searchTerms.length
     ? await prisma.ingredient.findMany({
       where: {
         available: true,
-        OR: parsedIngredients.map((name) => ({
+        OR: searchTerms.map((term) => ({
           name: {
-            equals: name,
+            contains: term,
             mode: 'insensitive',
           },
         })),
@@ -87,11 +236,18 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
     })
     : [];
 
-  const vendorByIngredient = parsedIngredients.map((ingredientName) => ({
-    name: ingredientName,
-    offers: vendorIngredients.filter(
-      (item) => item.name.toLowerCase() === ingredientName.toLowerCase(),
-    ),
+  const vendorIngredientEntries = vendorIngredientResults.map((ingredient) => ({
+    ingredient,
+    normalizedName: normalizeIngredientName(ingredient.name),
+  }));
+
+  const vendorByIngredient = ingredientMetadata.map((ingredient) => ({
+    name: ingredient.displayName,
+    offers: vendorIngredientEntries
+      .filter(({ normalizedName, ingredient: offer }) =>
+        matchesVendorIngredient(ingredient.searchTokens, normalizedName, offer.name),
+      )
+      .map(({ ingredient: offer }) => offer),
   }));
 
   let isFavorited = false;

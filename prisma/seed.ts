@@ -52,8 +52,6 @@ async function main() {
   // Seed INGREDIENTS
   if (config.defaultIngredients) {
     for (const ing of config.defaultIngredients) {
-      console.log(`  Creating ingredient: ${ing.name}`);
-
       const vendor = await prisma.vendor.findFirst({
         where: { name: ing.vendorName },
       });
@@ -63,16 +61,48 @@ async function main() {
         continue;
       }
 
-      await prisma.ingredient.create({
-        data: {
+      const matchingIngredients = await prisma.ingredient.findMany({
+        where: {
+          vendorId: vendor.id,
           owner: ing.owner,
           name: ing.name,
-          price: ing.price,
-          size: ing.size,
-          available: ing.available,
-          vendorId: vendor.id,
         },
+        orderBy: { id: 'asc' },
       });
+
+      if (matchingIngredients.length > 0) {
+        const [primaryIngredient, ...duplicates] = matchingIngredients;
+        console.log(`  Updating ingredient: ${ing.name} for vendor ${vendor.name}`);
+        await prisma.ingredient.update({
+          where: { id: primaryIngredient.id },
+          data: {
+            price: ing.price,
+            size: ing.size,
+            available: ing.available,
+          },
+        });
+
+        if (duplicates.length > 0) {
+          console.log(`    Removing ${duplicates.length} duplicate(s) for ${ing.name}`);
+          await prisma.ingredient.deleteMany({
+            where: {
+              id: { in: duplicates.map((dup) => dup.id) },
+            },
+          });
+        }
+      } else {
+        console.log(`  Creating ingredient: ${ing.name}`);
+        await prisma.ingredient.create({
+          data: {
+            owner: ing.owner,
+            name: ing.name,
+            price: ing.price,
+            size: ing.size,
+            available: ing.available,
+            vendorId: vendor.id,
+          },
+        });
+      }
     }
   }
 
