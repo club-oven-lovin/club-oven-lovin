@@ -112,6 +112,21 @@ export async function addRecipe(recipe: {
 }
 
 /**
+ * Deletes a recipe and its related data.
+ */
+export async function deleteRecipeById(recipeId: number) {
+  await prisma.review.deleteMany({
+    where: { recipeId },
+  });
+  await prisma.favorite.deleteMany({
+    where: { recipeId },
+  });
+  await prisma.recipe.delete({
+    where: { id: recipeId },
+  });
+}
+
+/**
  * Edits an existing stuff in the database.
  * @param stuff, an object with the following properties: id, name, quantity, owner, condition.
  */

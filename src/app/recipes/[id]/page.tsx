@@ -1,9 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import authOptions from '@/lib/authOptions';
+import { deleteRecipeById } from '@/lib/dbActions';
 import FavoriteButton from '@/components/FavoriteButton';
 import ReviewModal from '@/components/ReviewModal';
 import ReviewsList from '@/components/ReviewsList';
@@ -202,6 +203,16 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
   }
 
   const canEdit = !!currentUserEmail && recipe.owner === currentUserEmail;
+  const canDelete = isAdmin || canEdit;
+
+  const handleDelete = async () => {
+    'use server';
+    if (!canDelete) {
+      throw new Error('Unauthorized');
+    }
+    await deleteRecipeById(recipe.id);
+    redirect('/browse-recipes');
+  };
 
   // Calculate Aggregates
   const totalRating = recipe.reviews.reduce((sum, r) => sum + r.rating, 0);
@@ -293,6 +304,14 @@ export default async function RecipeDetailPage({ params }: { params: { id: strin
                   >
                     Edit recipe
                   </Link>
+                )}
+
+                {canDelete && (
+                  <form action={handleDelete} className="w-100 mb-3">
+                    <button type="submit" className="btn btn-outline-danger w-100">
+                      Delete recipe
+                    </button>
+                  </form>
                 )}
 
                 {userId && (
