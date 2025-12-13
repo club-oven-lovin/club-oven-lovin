@@ -11,7 +11,7 @@ import StarRating from '@/components/StarRating';
 
 const cleanIngredient = (ingredient: string) =>
   ingredient
-    .replace(/^[-•\d\.\)\s]+/, '')
+    .replace(/^[-•]\s*/, '')
     .trim();
 
 const parseIngredients = (ingredients: string) =>
