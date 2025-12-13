@@ -68,7 +68,20 @@ const UserHomePage = async () => {
   } | null;
 
   loggedInProtectedPage(session);
-  const displayName = session?.user?.name ?? 'user';
+
+  const sessionEmail = session?.user?.email ?? null;
+  let displayName = session?.user?.name ?? '';
+
+  if ((!displayName || displayName.trim().length === 0) && sessionEmail) {
+    const userRecord = await prisma.user.findUnique({
+      where: { email: sessionEmail },
+      select: { name: true },
+    });
+
+    displayName = userRecord?.name ?? sessionEmail.split('@')[0] ?? 'user';
+  }
+
+  displayName = displayName?.trim() || 'user';
 
   // Fetch recipes with reviews for rating calculation
   const recipesWithReviews = await prisma.recipe.findMany({
