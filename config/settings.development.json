@@ -4,7 +4,40 @@
     { "email": "john@foo.com", "password": "changeme" },
     { "email": "manoa-market@vendors.com", "password": "changeme", "role": "VENDOR" },
     { "email": "uh-produce@vendors.com", "password": "changeme", "role": "VENDOR" },
-    { "email": "island-ingredients@vendors.com", "password": "changeme", "role": "VENDOR" }
+    { "email": "island-ingredients@vendors.com", "password": "changeme", "role": "VENDOR" },
+
+    {
+      "email": "emma43@hawaii.edu",
+      "password": "changeme",
+      "role": "USER",
+      "name": "Emma",
+      "image": "https://randomuser.me/api/portraits/women/44.jpg",
+      "dietaryRestrictions": ["vegetarian"]
+    },
+    {
+      "email": "kai.nakamura@hawaii.edu",
+      "password": "changeme",
+      "role": "USER",
+      "name": "Kai",
+      "image": "https://i.pinimg.com/280x280_RS/e2/75/b9/e275b9c6bb024ff4856c42ed556565b1.jpg",
+      "dietaryRestrictions": ["nut-free", "dairy-free"]
+    },
+    {
+      "email": "miasantos@hawaii.edu",
+      "password": "changeme",
+      "role": "USER",
+      "name": "Mia",
+      "image": "https://i.pinimg.com/736x/4a/19/ac/4a19ace2c10e8dda74cb256d77eb7dd3.jpg",
+      "dietaryRestrictions": []
+    },
+    {
+      "email": "noah.kim57@hawaii.edu",
+      "password": "changeme",
+      "role": "USER",
+      "name": "Noah Kim",
+      "image": "https://randomuser.me/api/portraits/men/52.jpg",
+      "dietaryRestrictions": ["vegan", "gluten-free"]
+    }
   ],
 
   "defaultData": [
