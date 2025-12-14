@@ -1,9 +1,46 @@
 'use server';
 
-import { Stuff, Condition } from '@prisma/client';
+import { Stuff, Condition, Role } from '@prisma/client';
 import { hash } from 'bcrypt';
 import { redirect } from 'next/navigation';
 import { prisma } from './prisma';
+
+/**
+ * Updates a user's role (Admin only).
+ * @param userId - The ID of the user to update
+ * @param role - The new role (USER, VENDOR, or ADMIN)
+ */
+export async function updateUserRole(userId: number, role: Role) {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { role },
+  });
+}
+
+/**
+ * Deletes a user from the database (Admin only).
+ * @param userId - The ID of the user to delete
+ */
+export async function deleteUser(userId: number) {
+  await prisma.user.delete({
+    where: { id: userId },
+  });
+}
+
+/**
+ * Deletes a vendor from the database (Admin only).
+ * @param vendorId - The ID of the vendor to delete
+ */
+export async function deleteVendor(vendorId: string) {
+  // First delete all ingredients associated with this vendor
+  await prisma.ingredient.deleteMany({
+    where: { vendorId },
+  });
+  // Then delete the vendor
+  await prisma.vendor.delete({
+    where: { id: vendorId },
+  });
+}
 
 /**
  * Adds a new stuff to the database.
@@ -72,6 +109,21 @@ export async function addRecipe(recipe: {
   });
 
   redirect("/browse-recipes");
+}
+
+/**
+ * Deletes a recipe and its related data.
+ */
+export async function deleteRecipeById(recipeId: number) {
+  await prisma.review.deleteMany({
+    where: { recipeId },
+  });
+  await prisma.favorite.deleteMany({
+    where: { recipeId },
+  });
+  await prisma.recipe.delete({
+    where: { id: recipeId },
+  });
 }
 
 /**
@@ -177,3 +229,64 @@ export async function changePassword(credentials: { email: string; password: str
     },
   });
 }
+
+export async function addFavorite(userId: number, recipeId: number) {
+  return prisma.favorite.create({
+    data: { userId, recipeId },
+  });
+}
+
+export async function removeFavorite(userId: number, recipeId: number) {
+  return prisma.favorite.deleteMany({
+    where: { userId, recipeId },
+  });
+}
+
+export async function toggleFavorite(userId: number, recipeId: number) {
+  const existing = await prisma.favorite.findFirst({
+    where: { userId, recipeId },
+  });
+
+  if (existing) {
+    await prisma.favorite.delete({ where: { id: existing.id } });
+    return { favorited: false };
+  }
+
+  await prisma.favorite.create({
+    data: { userId, recipeId },
+  });
+
+  return { favorited: true };
+}
+/**
+ * Updates vendor profile information.
+ */
+export async function updateVendorProfile(data: {
+  id: string;
+  name: string;
+  address: string;
+  hours: string;
+  owner: string; // needed for uniqueness check logic
+}) {
+  // Check if name is already taken by another vendor
+  const existing = await prisma.vendor.findFirst({
+    where: {
+      name: data.name,
+      id: { not: data.id }, // exclude self
+    },
+  });
+
+  if (existing) {
+    throw new Error('This vendor name is already taken.');
+  }
+
+  return prisma.vendor.update({
+    where: { id: data.id },
+    data: {
+      name: data.name,
+      address: data.address,
+      hours: data.hours,
+    },
+  });
+}
+

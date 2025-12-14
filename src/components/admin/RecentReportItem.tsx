@@ -6,9 +6,9 @@ type RecentReportItemProps = {
 };
 
 const RecentReportItem: React.FC<RecentReportItemProps> = ({ title, detail }) => (
-    <li className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-        <p className="text-base font-semibold text-slate-900">{title}</p>
-        {detail ? <p className="mt-1 text-sm text-slate-600">{detail}</p> : null}
+    <li className="rounded-3xl border border-orange-100 bg-white p-6 shadow-sm transition hover:shadow-md">
+        <p className="text-base font-bold text-[#2A2A2A]">{title}</p>
+        {detail ? <p className="mt-2 text-sm opacity-70 text-[#2A2A2A]">{detail}</p> : null}
     </li>
 );
 

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Table, Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
 import { CheckCircleFill, XCircleFill, PencilSquare, PlusCircle } from 'react-bootstrap-icons';
 import { addIngredient, updateIngredient } from '@/lib/dbActions';
+import EditVendorProfileForm from './EditVendorProfileForm';
 import type { Ingredient, Vendor as VendorType } from '@prisma/client';
 
 export default function Vendor({
@@ -14,6 +15,8 @@ export default function Vendor({
   ingredients: Ingredient[];
 }) {
   const [ingredients, setIngredients] = useState(initialIngredients);
+  const [vendorData, setVendorData] = useState(vendor);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   // Track the row being edited
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -55,12 +58,12 @@ export default function Vendor({
       prev.map((i) =>
         i.id === editForm.id
           ? {
-              ...i,
-              name: editForm.name,
-              price: parseFloat(editForm.price),
-              size: editForm.size,
-              available: editForm.available,
-            }
+            ...i,
+            name: editForm.name,
+            price: parseFloat(editForm.price),
+            size: editForm.size,
+            available: editForm.available,
+          }
           : i
       )
     );
@@ -105,18 +108,41 @@ export default function Vendor({
     <Container className="py-4">
 
       {/* Greeting card */}
-      <Card
-        className="vendor-homepage-greeting-card mb-4 shadow-sm"
-        data-testid="vendor-greeting-card"
-      >
-        <Card.Body className="text-center">
-          <Card.Title className="fs-2">Welcome, {vendor?.name || 'Vendor'}</Card.Title>
-          <Card.Text>
-            Location: <strong>{vendor?.address || 'N/A'}</strong><br />
-            Hours: {vendor?.hours || 'N/A'}
-          </Card.Text>
-        </Card.Body>
-      </Card>
+      {/* Greeting card */}
+      {isEditingProfile && vendorData ? (
+        <Card className="vendor-homepage-greeting-card mb-4 shadow-sm">
+          <Card.Body>
+            <EditVendorProfileForm
+              vendor={vendorData}
+              onCancel={() => setIsEditingProfile(false)}
+              onSuccess={(updated) => {
+                setVendorData(updated);
+                setIsEditingProfile(false);
+              }}
+            />
+          </Card.Body>
+        </Card>
+      ) : (
+        <Card
+          className="vendor-homepage-greeting-card mb-4 shadow-sm"
+          data-testid="vendor-greeting-card"
+        >
+          <Card.Body className="text-center position-relative">
+            <Button
+              variant="link"
+              className="position-absolute top-0 end-0 m-2 text-decoration-none"
+              onClick={() => setIsEditingProfile(true)}
+            >
+              <PencilSquare size={20} />
+            </Button>
+            <Card.Title className="fs-2">Welcome, {vendorData?.name || 'Vendor'}</Card.Title>
+            <Card.Text>
+              Location: <strong>{vendorData?.address || 'N/A'}</strong><br />
+              Hours: {vendorData?.hours || 'N/A'}
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      )}
 
       {/* Ingredients table */}
       <Table
